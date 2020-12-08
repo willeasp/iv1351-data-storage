@@ -52,7 +52,7 @@ CREATE TABLE student_instrument_skill (
 
 
 CREATE TABLE student_parent (
- parent_id SERIAL NOT NULL REFERENCES parent (parent_id) ON DELETE CASCADE,
+ parent_id SERIAL NOT NULL REFERENCES parent_contact_details (parent_id) ON DELETE CASCADE,
  student_id SERIAL NOT NULL REFERENCES student (student_id) ON DELETE CASCADE,
  CONSTRAINT pk_student_parent
   PRIMARY KEY (parent_id, student_id)
@@ -100,7 +100,6 @@ CREATE TABLE days_of_extra_charge (
 
 CREATE TABLE instructor (
  instructor_id SERIAL NOT NULL PRIMARY KEY,
- school_id VARCHAR(500) REFERENCES school (school_id),
  person_id SERIAL NOT NULL REFERENCES person (person_id) ON DELETE NO ACTION,
  teaches_ensembles BOOLEAN
 );
@@ -111,7 +110,7 @@ CREATE TABLE instructor_availability (
  instructor_id SERIAL NOT NULL REFERENCES instructor (instructor_id) ON DELETE CASCADE,
  start_time TIME(0),
  end_time TIME(0),
- date DATE
+ "date" DATE
 );
 
 
@@ -139,6 +138,14 @@ CREATE TABLE pricing_specification (
  extra_charge DECIMAL(3)
 );
 
+CREATE TABLE rental_instrument (
+ ri_id SERIAL NOT NULL PRIMARY KEY,
+ name VARCHAR(500) NOT NULL,
+ type VARCHAR(500) NOT NULL,
+ brand VARCHAR(500),
+ monthly_cost DECIMAL(3)
+);
+
 
 CREATE TABLE rental (
  rental_id SERIAL NOT NULL PRIMARY KEY,
@@ -146,15 +153,6 @@ CREATE TABLE rental (
  end_date DATE,
  student_id SERIAL NOT NULL REFERENCES student (student_id) ON DELETE NO ACTION,
  ri_id SERIAL NOT NULL REFERENCES rental_instrument (ri_id) ON DELETE NO ACTION
-);
-
-
-CREATE TABLE rental_instrument (
- ri_id SERIAL NOT NULL PRIMARY KEY,
- name VARCHAR(500) NOT NULL,
- type VARCHAR(500) NOT NULL,
- brand VARCHAR(500),
- monthly_cost DECIMAL(3)
 );
 
 
@@ -219,8 +217,8 @@ CREATE TABLE individual_lesson (
 
 
 CREATE TABLE g_lesson_student (
- student_id SERIAL NOT NULL,
- g_lesson_id SERIAL NOT NULL,
+ student_id SERIAL NOT NULL REFERENCES student (student_id),
+ g_lesson_id SERIAL NOT NULL REFERENCES group_lesson (g_lesson_id),
  CONSTRAINT PK_g_lesson_student 
   PRIMARY KEY (student_id, g_lesson_id)
 );
