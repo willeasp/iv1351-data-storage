@@ -1,0 +1,200 @@
+\documentclass[a4paper]{scrreprt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{amsmath}
+\usepackage{lastpage}
+\usepackage{pgf}
+\usepackage{wrapfig}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+
+% Define own tags
+\def\code#1{\texttt{#1}}
+
+% Create header and footer
+\headheight 27pt
+\pagestyle{fancyplain}
+\lhead{\footnotesize{Data Storage Paradigms}}
+\chead{\footnotesize{Project Report}}
+\rhead{}
+\lfoot{}
+\cfoot{\thepage\ (\pageref{LastPage})}
+\rfoot{}
+
+% Create title page
+\title{Project Report}
+\subtitle{Data Storage Paradigms, IV1351}
+\author{William Asp, wasp@kth.se}
+%\date{\today} Prints today's date
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents %Generates the TOC
+
+\chapter{Introduction}
+
+\chapter{Literature Study}
+\section{Task 1, Conceptual Model}
+The information about how to create the conceptual model was collected by viewing the lecture on IE notation and conceptual modeling. Chapter 3 in the course book \cite{fundamentals-book} was also read lightly, although not in depth. 
+Earlier experience in modeling comes from the course IV1350 Object Oriented Design, where a domain model was designed.
+
+The information collected about how to make a conceptual model can be summarized by: 
+\begin{itemize}
+\item Do noun identification for entity candidates
+\item Use a category list to find more entity candidates
+\item Remove unnecessary entities
+\item Find attributes
+\item Find relations
+\item Review
+\end{itemize}
+\cite{object-book}
+
+The steps are the same for domain modeling, but the focus for conceptual modeling is the data and its relations. Some points to keep in mind are:
+\begin{itemize}
+\item There is no point in an entity without attributes
+\item It is important to find all attributes
+\item For each attribute define cardinality, whether the attribute must be unique, and if it is allowed to be without value
+\item It is important to find all relations
+\item Specify cardinality for all relations
+\end{itemize}
+\cite{concept-lecture}
+
+\section{Task 2, LogPhys Model}
+The literature used to prepare for the task was to view the lectures supplied about Logical and Physical models. The lectures were determined to give sufficient knowledge and approaches to be able to complete the task.
+
+The lectures were about logical and physical modeling, and an intersection between the two that were to be made in the task. The lectures also covered steps on how to convert the conceptual model to the LogPhys Model.
+
+
+
+\chapter{Method}
+\section{Task 1, Conceptual Model}
+All modelling in this task was done in the modelling program Astah.
+
+Creating the conceptual model, the first step made was to do noun identification on the project description. This is to find all the possible entity candidates to use in the database. The next step was to use a category list to find more possible entity candidates. After all possible entities have been found, unnecessary entities were removed. 
+
+When all entities had been found, the next thing to do was finding entity attributes. When finding the attributes, the things to keep in mind were that attributes can only be of the type string, bool, number or time. Attributes can not have attributes, and an attribute is not a part of an entity.
+For each attribute, the cardinality was defined, whether the attribute must be unique, and if it is allowed to be without value. Much time was spent on trying to find all attributes.
+
+When finding all attributes, time was also spent on trying to find relations between entities. It is important to find all relations. It is also important to find all specify the cardinality for each relation.
+
+The improvement from above steps is reviewed multiple times and redone to improve the model as much as possible.
+
+\section{Task 2, Logical And Physical Model}
+This task was solved using the Astah diagram editor.
+The first step was creating a table for each entity. In each entity, a column was created for each attribute with the cardinality 0..1 or 1..1. For each attribute with a higher cardinality, a new table was created. For each column, type (domain) was specified, and column constraints were considered, which means to decide for example if an attribute can not be null or if it has to be unique in the column. Primary keys were assigned to all strong entities, where surrogate keys are preferred. 
+
+When modeling relations, there were some things to consider. When modeling one-to-one and one-to-many relations, the approach was: Create the relation, start with using the PK of the strong end as foreign key in the weak end, if the weak end has meaning without the strong end, use a surrogate PK there as well. Otherwise the foreign key as the primary key. When storing foreign keys, constraints were considered, meaning it was decided if deletion of the foreign key would delete all other references to that entity, or if it would simply set it to null, or if it were to be illegal to delete.
+
+For each many-to-many relation, a cross-reference table was created. Present PKs were used as FKs. The PK is either the FKs combined or a surrogate PK. Also here FK constraints were considered. 
+
+For tables representing multi-valued attributes, the PK of the “parent” was assigned as the FK, the PK were set as the FK and the multi-valued attributes combined.
+
+Lastly, the model was verified to be normalized and that it was possible to perform all planned operations on the data.
+
+
+
+   
+\chapter{Result}
+\section{Task 1, Conceptual Model}
+
+\begin{figure}[h]
+    \includegraphics[width=\textwidth]{ConceptualModel.PNG}
+    \caption{Conceptual model diagram.}
+    \label{fig:conceptual-model}
+\end{figure}
+
+The conceptual model as seen above in figure \ref{fig:conceptual-model} uses inheritance from Person to Student and Instructor. This is done because both student and instructor share some attributes. At the same way, RentalInstrument inherits Instrument. This is done because RentalInstrument is seen as a physical object, it has attributes that are used in the “real world”, while Instrument is just seen as the “idea” of an instrument, or simply what type of instrument it is. This is done to make a difference of an instrument that a person plays (you can say you play an instrument but you don't necessarily own it), and when a person rents an instrument.
+Some places in the model you can see the keyword DERIVED. This means that the attribute is calculated by other things in the diagram.
+
+\section{Task 2, Logical And Physical Model}
+The logical model result can be seen in figure \ref{fig:logphys-model}.
+Link to GitHub repository: \href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring}
+{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring}
+
+The model can be seen in figure \ref{fig:logphys-model} below.
+The Logical-Physical model created during this task covers the entire SoundGood music school application description The diagram is made in crow foot’s notation, and a database was created based exactly on the diagram. 
+The database has persons, that can be a student, instructor or both. The student and group, ensemble-lessons are linked with many-to-many relationship to allow lessons to know what students are attending the lesson. 
+Instrument is connected to multiple lessons, to be able to know what lessons are using a specific instrument. Instrument and instructor, student also has a many-to-many relationship to be able to find both what instructors plays a specific instrument and what instruments a specific instructor plays. Person was chosen to still be in the model, since it might be of interest to keep all the persons currently in the database, aside from the student and instructor information.
+
+
+\begin{figure}[h]
+    \includegraphics[width=\textwidth]{LogPhys Model 1.png}
+    \caption{Logical-Physical model diagram.}
+    \label{fig:logphys-model}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\chapter{Discussion}
+\section{Task 1, Conceptual Model}
+
+The model follows the naming criteria, with everything using camelcase, capitalized first letter of the entity names, and small first letter of attribute names and relations. The names are made to be concise and are easily understandable. 
+
+The model was made to be as concise as possible, to keep it simple to understand for further modeling. There is a reasonable number of entities that cover every aspect of the requirement specification, not too few or too many. There might be some entity missing that ended up as an attribute, or some entity that should have been an attribute. For example, the skill entity could have been an attribute of Student, but then it would be difficult to model multiple instruments. Or it could have been an attribute of Instrument, with the instrument type and skill level being in a table that belongs to Student.
+
+All data that shall be stored are modeled into attributes of relations in the model. The cardinality is not specified for all attributes, but it is for the ones where the cardinality can be multiple. There is also specified which attributes shall be unique and which attributes which cannot be null. The attributes firstName and lastName of Person might not need to be NOT NULL, but this was chosen to be able to identify students that are assigned to lessons by name, but this was just a design choice.
+
+All relevant relations are specified with cardinality and name. There are sufficient relations to fulfill the requirement specification, but there are some cases where it is possible to draw additional relations. For example lessons could be related to Pricing as to show that they use that pricing, and SoundgoodMusicSchool could have more relations, for example to all the lessons, to show that it sells them. 
+
+The different types of lessons (“IndividualLesson”, “GroupLesson”, and “Ensemble”) are chosen not to inherit a superclass "Lesson", since it was evaluated that they do not have enough in common to make them a subclass. 
+
+There are not many notes in the diagram, but the ones there are explains more about the pricing scheme. There are no constraints in the diagram as plain text which might be a problem, but the constraints were tried to be built in the attributes of entities, for example minStudentAge in SoundGoodMusicSchool is a constraint of the minimum age of a student applying to the school.
+
+For the higher grade part of Task 1, I used inheritance when modeling Instructor and Student, and named the superclass of them “Person”. The advantage of using Person as a superclass is that for the properties similar to student and Instructor, it only has to be modeled once, not for both Student and Instructor. Another advantage is that the model can become clearer to understand, or the layout of the model is better. The Student’s unique attributes makes it more clear what is special in relation to the Instructor. A disadvantage of using inheritance in the conceptual model is that it might not reflect well on how the design in the database will be, it might in fact make it more unclear as to how to model the database. 
+
+Overall, the model is evaluated so that it does the job good enough to help modeling the database further.
+
+
+\section{Task 2, Logical And Physical Model}
+The naming conventions are followed, since all tables and attributes are written in snake case. The names contain information about what they are, when they are seen in the context of the table they are in. For example \code{price} in \code{individual\_lesson} is understood in the context of the table, otherwise it might be hard to understand.
+The model is not fully in 3NF. For example in person, the address is stored directly in the person, as to not have a separate table for it. This was made because an address can have one to many people, and many persons can have one address, which would be a many-to-many relationship. But this amount of logic and relations needed to create that seemed unnecessary after some consideration, and the result was to put them directly in the person, at the cost of maybe having multiple addresses the same in the table. This might turn out to be bad in the future, or to be easier to use. Other than that the model is seen to be in 3NF.
+
+The tables that exist in the model are made to exist for good purpose, it was wanted to avoid normalizing too much, and have many tables that only serve one small purpose. The tables that normalizing was used, were tables that would have been superfluous otherwise. The application that was described in the project description was taken very much by the words, and no other functionality or data was assumed to be stored in the database, which led to many design choices being made. 
+
+constraints were decided upon if they were to be set to NOT NULL or not, which was a difficult task to decide. Because of the impact of how the application will work, many times it was felt that almost all attributes should have NOT NULL as column constraint. Instead, the philosophy used to make decisions was that the user also is responsible to make sure that attributes have to be set or not. From experience, if a program complains that an attribute can not be not set, that leads to a lot of frustration if that attribute or setting does not even matter for the task that one wants to do. That lead to trying to avoid setting too many NOT NULLs. 
+As for the column type, that was not too hard to decide upon, the only thing to decide was the length of the VARCHAR data type. Mostly this was not thought too hard about, and was instead set as a rather large number, as Leif on the lectured mentioned in the lectures that it’s not the programmer to decide how long the longest name one can have is, for example.
+As for foreign key constraints, it was thought that the program should not allow the user to delete things and set NULLs all over the database. Instead, they would get an error and delete the data relating to the tuple one wanted to delete in the first place. ON DELETE SET NULL was only set where the child actually could be of interest to keep without the parent. 
+The ON DELETE CASCADE was chosen to be set on most places where the foreign key was set to NOT NULL. This means that if the parent the FK is pointing to is deleted, then the child (tuple with foreign key NOT NULL) might as well be deleted, since it has no meaning otherwise. This is mostly true for cross-reference tables, that is useful for pointing many-to-many relations.
+
+Most primary keys are chosen to be surrogate keys, since many tables have meaning without the parent. Also, when having tables on the many side of a one-to-many relation, there can not be the foreign key as primary key, oftentimes, a own surrogate key was given to such tables, also since surrogate keys are a better future proof way to keep the tables.
+
+All relevant relations are specified, but there is a relation that is not seen, although it is written about. The \code{lesson\_pricing} table does have information that each lesson will get it’s price from, but that is not seen in the diagram. That was made so that the lessons will “remember” their price at the time of the lesson, even if the pricing scheme changes at the end of the month. 
+
+As relations were tested against logic in the project description during modeling, the model should hold up well when performing the tasks described. Also since the model should be well constructed with all important information being available in the model, it should be able to perform all tasks.
+
+There are some business rules and constraints that are not visible in the diagram, for example that there can only be two rentals per student. The relationship was left as a one-to-many relationship, since that is what it is in the database model. The constraint should have been left as a note in the diagram.
+
+
+
+\begin{thebibliography}{3}
+    \bibitem{object-book}
+    Leif Lindbäck
+    \textit{A First Course in Object Oriented Development, A Hands-On Approach}
+    November 17, 2020
+    
+    \bibitem{fundamentals-book}
+    Ramez Elmasri, Shamkant B. Navathe
+    \textit{Fundamentals of Database Systems, 7th Edition}
+    November 17, 2020
+    
+    \bibitem{concept-lecture}
+    Lecture on Conceptual Modeling in course "IV1351 Data Storage" at KTH Royal Institute of technology.
+    [Internet source, retrieved 2020-11-25] url: 
+    \href{https://kth.instructure.com/courses/19966/pages/conceptual-model?module_item_id=252540}{balle}
+    
+    
+\end{thebibliography}
+
+\end{document}
