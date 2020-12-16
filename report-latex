@@ -12,6 +12,7 @@
 \usepackage{wrapfig}
 \usepackage{fancyvrb}
 \usepackage{hyperref}
+\usepackage{xcolor}
 
 % Define own tags
 \def\code#1{\texttt{#1}}
@@ -116,9 +117,13 @@ Some places in the model you can see the keyword DERIVED. This means that the at
 
 \section{Task 2, Logical And Physical Model}
 The logical model result can be seen in figure \ref{fig:logphys-model}.
-Link to GitHub repository: \href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring}
-{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring}
 
+\noindent Link to GitHub repository: {
+    \color{blue}\href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring}
+                    {https://gits-15.sys.kth.se/wasp/IV1351-Datalagring}
+}
+
+\\~\\
 The model can be seen in figure \ref{fig:logphys-model} below.
 The Logical-Physical model created during this task covers the entire SoundGood music school application description The diagram is made in crow foot’s notation, and a database was created based exactly on the diagram. 
 The database has persons, that can be a student, instructor or both. The student and group, ensemble-lessons are linked with many-to-many relationship to allow lessons to know what students are attending the lesson. 
@@ -175,6 +180,14 @@ All relevant relations are specified, but there is a relation that is not seen, 
 As relations were tested against logic in the project description during modeling, the model should hold up well when performing the tasks described. Also since the model should be well constructed with all important information being available in the model, it should be able to perform all tasks.
 
 There are some business rules and constraints that are not visible in the diagram, for example that there can only be two rentals per student. The relationship was left as a one-to-many relationship, since that is what it is in the database model. The constraint should have been left as a note in the diagram.
+
+\subsection{Higher Grade}
+There are a couple different options when mapping inheritance in the logical model. 
+The different kinds of options when implementing can be divided into two categories, either multiple relations, or single relations. When using multiple relations, the superclass is its own table, for example Person, and the different subclasses are tables with each subclass’ specific attributes. This was the approach made in the model created in this task. The other option considered was to create two tables for student and instructor both containing the person attributes, along with each specific attributes for student and instructor. 
+There might not be a difference in the logical model depending on whether inheritance was used in the conceptual model. Depending on what option is used when mapping inheritance to the logical model, there is a possibility that the resulting logical model can work exactly as if there hadn’t been inheritance in the conceptual model. For example: if the conceptual model had the student and instructor entities, both with name, personnumber etc, then the logical model could be modeled exactly like that. But if the conceptual model had a superclass person to student and instructor, then the logical model could still be modeled using just student and instructor, both having the same attributes as person. 
+ 
+The advantage of using inheritance is that it enables the database to store more general information, for example all persons that exist in a database. It is a better way to divide the same type of information in the database as well, since there aren’t many columns over many tables that store the exact same type of data. A problem that might arise is that the database becomes difficult to control using constraints, for example: The database contains superclass person for student and instructor. Should a person be able to exist without either a student or instructor? Can a person be both? Doing it this way makes it harder to figure out these types of constraints. Having inheritance also may help with keeping fewer relations, for example, should a person be related to “email” or should instructor and student both be related to email? 
+The advantage of not using inheritance is that there are fewer tables in the database to keep track of. It is not needed to query many tables to get information about a child entity. 
 
 
 
