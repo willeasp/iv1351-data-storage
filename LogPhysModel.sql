@@ -1,3 +1,11 @@
+\c postgres;
+DROP DATABASE soundgood;
+
+CREATE DATABASE soundgood;
+\c soundgood;
+
+
+
 BEGIN;
 
 CREATE TABLE instrument (
@@ -36,8 +44,8 @@ CREATE TABLE school (
 
 
 CREATE TABLE student (
- student_id SERIAL NOT NULL PRIMARY KEY,
  person_id INT NOT NULL REFERENCES person (person_id) ON DELETE NO ACTION,
+ student_id SERIAL NOT NULL PRIMARY KEY
 );
 
 
@@ -125,16 +133,16 @@ CREATE TABLE lesson_pricing (
  pricing_id SERIAL NOT NULL PRIMARY KEY,
  type VARCHAR(30) NOT NULL,
  level VARCHAR(30) NOT NULL,
- student_price DECIMAL(3),
- instructor_pay DECIMAL(3),
+ student_price DECIMAL(20, 2),
+ instructor_pay DECIMAL(20, 2),
  school_id INT NOT NULL REFERENCES school (school_id) ON DELETE CASCADE
 );
 
 
 CREATE TABLE pricing_specification (
  school_id INT NOT NULL PRIMARY KEY REFERENCES school (school_id) ON DELETE CASCADE,
- discount_amount DECIMAL(3),
- extra_charge DECIMAL(3)
+ discount_amount DECIMAL(20, 2),
+ extra_charge DECIMAL(20, 2)
 );
 
 CREATE TABLE rental_instrument (
@@ -142,7 +150,7 @@ CREATE TABLE rental_instrument (
  name VARCHAR(500) NOT NULL,
  type VARCHAR(500) NOT NULL,
  brand VARCHAR(500),
- monthly_cost DECIMAL(3)
+ monthly_cost DECIMAL(20, 2)
 );
 
 
@@ -173,8 +181,8 @@ CREATE TABLE ensemble (
  start_time TIME(0),
  end_time TIME(0),
  "date" DATE,
- price DECIMAL(3),
- pay DECIMAL(3)
+ price DECIMAL(20, 2),
+ pay DECIMAL(20, 2)
 );
 
 
@@ -187,7 +195,7 @@ CREATE TABLE ensemble_lesson_student (
 
 
 CREATE TABLE group_lesson (
- g_lesson_id INT NOT NULL PRIMARY KEY,
+ g_lesson_id SERIAL NOT NULL PRIMARY KEY,
  instrument_id INT NOT NULL REFERENCES instrument (instrument_id),
  instructor_id INT REFERENCES instructor (instructor_id),
  max_students INT NOT NULL,
@@ -196,13 +204,13 @@ CREATE TABLE group_lesson (
  start_time TIME(0),
  end_time TIME(0),
  "date" DATE,
- price DECIMAL(3),
- pay DECIMAL(3)
+ price DECIMAL(20, 2),
+ pay DECIMAL(20, 2)
 );
 
 
 CREATE TABLE individual_lesson (
- i_lesson_id INT NOT NULL PRIMARY KEY,
+ i_lesson_id SERIAL NOT NULL PRIMARY KEY,
  instrument_id INT NOT NULL REFERENCES instrument (instrument_id),
  level VARCHAR(20),
  instructor_id INT REFERENCES instructor (instructor_id),
@@ -210,8 +218,8 @@ CREATE TABLE individual_lesson (
  start_time TIME(0),
  end_time TIME(0),
  "date" DATE,
- price CHAR(10),
- pay CHAR(10)
+ price DECIMAL(20, 2),
+ pay DECIMAL(20, 2)
 );
 
 
@@ -223,3 +231,7 @@ CREATE TABLE g_lesson_student (
 );
 
 COMMIT;
+
+
+/* Populate data */
+\i /host_files/PopulateDataHardLink.sql;
