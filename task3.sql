@@ -47,3 +47,37 @@ be possible to retrieve the total number of lessons (just one number) and
 the specific number of individual lessons, group lessons and ensembles. This 
 query is expected to be performed a few times per week. 
 */
+
+SELECT * FROM individual_lesson;
+SELECT * FROM group_lesson;
+SELECT * FROM ensemble;
+
+SELECT  COALESCE("Month", 'Total') AS "Month", 
+        SUM("count") FROM (
+    SELECT TO_CHAR("date", 'Mon') AS "Month", 
+        COUNT(*) FROM individual_lesson 
+        GROUP BY "Month"
+    UNION ALL
+        SELECT TO_CHAR("date", 'Mon') AS "Month", COUNT(*) FROM group_lesson GROUP BY "Month"
+    UNION ALL
+        SELECT TO_CHAR("date", 'Mon') AS "Month", COUNT(*) FROM ensemble GROUP BY "Month"
+) AS lessons
+GROUP BY ROLLUP("Month")
+
+;
+
+
+
+/* 
+4. NOT FINISHED
+The same as above, but retrieve the average number of lessons per month
+during the entire year, instead of the total for each month. */
+
+
+/* 
+5. NOT FINISHED
+List all instructors who has given more than a specific number of lessons
+during the current month. Sum all lessons, independent of type. Also list the 
+three instructors having given most lessons (independent of lesson type) during 
+the last month, sorted by number of given lessons. This query will be used to 
+find instructors risking to work too much, and will be executed daily. */
