@@ -8,21 +8,48 @@ It shall be possible to retrieve the total number of rented instruments
 guitar, trumpet, etc). The latter list shall be sorted by number of rentals. 
 This query is expected to be performed a few times per week. 
 */
+/* 
+SELECT  COALESCE("Month", 'ALL') AS "Month", 
+        COALESCE("Instrument", 'TOTAL') AS "Instrument",
+        "Rentals" 
+FROM    (
+    SELECT  
+        TO_CHAR(r.start_date, 'Month') AS "Month", 
+        ri.name AS "Instrument", 
+        COUNT(ri.name) AS "Rentals" 
+    FROM 
+        rental AS r
+    JOIN 
+        rental_instrument AS ri
+    ON 
+        r.ri_id = ri.ri_id
+    WHERE 
+        EXTRACT(YEAR FROM r.start_date) = 2020
+    GROUP BY 
+        ROLLUP("Month"), ROLLUP("Instrument")
+) AS query
+ORDER BY 
+    "Month"; */
 
-/* SELECT * FROM (
-    SELECT TO_CHAR(start_date,'Mon') AS "Month",
-        EXTRACT(YEAR FROM start_date) AS "Year",
-        COUNT(*) AS "Rented"
-    FROM rental
-    GROUP BY 1,2
-) AS rentals
-;
-
-SELECT name, COUNT(*) FROM rental_instrument 
-NATURAL JOIN rental
-GROUP BY name
-; */
-
+/* 
+   Month   | Instrument | Rentals
+-----------+------------+---------
+ ALL       | TOTAL      |       9
+ ALL       | violin     |       3
+ ALL       | trumpet    |       3
+ ALL       | guitar     |       3
+ April     | TOTAL      |       2
+ April     | trumpet    |       2
+ February  | TOTAL      |       2
+ February  | guitar     |       1
+ February  | violin     |       1
+ January   | TOTAL      |       2
+ January   | guitar     |       2
+ March     | violin     |       2
+ March     | TOTAL      |       2
+ May       | TOTAL      |       1
+ May       | trumpet    |       1 */
+/********************************************************************************************************************/
 
 /* 
 2. PROBABLY FINISHED
@@ -30,15 +57,58 @@ The same as above, but retrieve the average number of rentals per month
 during the entire year, instead of the total for each month. 
 */
 
-/* SELECT "Year", CAST(AVG("Rented") AS DECIMAL(10, 2)) AS "Average" FROM (
-    SELECT TO_CHAR(start_date,'Mon') AS "Month",
-        EXTRACT(YEAR FROM start_date) AS "Year",
-        COUNT(*) AS "Rented"
-    FROM rental
-    GROUP BY 1,2
+/* Average rentals of each instrument per month */
+SELECT 
+    "Instrument",
+    CAST(AVG("Rentals") AS DECIMAL(10, 2)) AS "Average"
+FROM (
+    SELECT 
+        TO_CHAR(r.start_date,'Mon') AS "Month",
+        ri.name AS "Instrument",
+        COUNT(*) AS "Rentals"
+    FROM 
+        rental AS r
+    JOIN 
+        rental_instrument AS ri
+    ON 
+        r.ri_id = ri.ri_id
+    WHERE
+        EXTRACT(YEAR FROM start_date) = 2020
+    GROUP BY 
+        "Month", "Instrument"
 ) AS rentals
-GROUP BY "Year"; */
+GROUP BY    
+    "Instrument"
 
+UNION ALL
+/* Get average of all instruments across all months */
+SELECT
+    'ALL' AS "Instrument",
+    CAST(AVG("Rented") AS DECIMAL(10, 2)) AS "Average" 
+FROM (
+    SELECT 
+        TO_CHAR(start_date,'Mon') AS "Month",
+        COUNT(*) AS "Rented"
+    FROM 
+        rental
+    WHERE
+        EXTRACT(YEAR FROM start_date) = 2020
+    GROUP BY
+        "Month" 
+) AS rentals;
+
+/* ACTUAL OUTPUT
+ Instrument | Average
+------------+---------
+ guitar     |    1.50
+ trumpet    |    1.50
+ violin     |    1.50
+ ALL        |    1.80
+  */
+
+
+
+/********************************************************************************************************************/
 
 /* 
 3. NOT FINISHED
@@ -48,7 +118,7 @@ the specific number of individual lessons, group lessons and ensembles. This
 query is expected to be performed a few times per week. 
 */
 
-SELECT * FROM individual_lesson;
+/* SELECT * FROM individual_lesson;
 SELECT * FROM group_lesson;
 SELECT * FROM ensemble;
 
@@ -65,14 +135,18 @@ SELECT  COALESCE("Month", 'Total') AS "Month",
 GROUP BY ROLLUP("Month")
 
 ;
+ */
 
 
+/********************************************************************************************************************/
 
 /* 
 4. NOT FINISHED
 The same as above, but retrieve the average number of lessons per month
 during the entire year, instead of the total for each month. */
 
+
+/********************************************************************************************************************/
 
 /* 
 5. NOT FINISHED
