@@ -144,9 +144,9 @@ INSERT INTO group_lesson (instrument_id, level, instructor_id, max_students, min
                     (3, 'advanced', 3, 8, 3, '13:00', '15:30', '2020-11-10', 120, 150);
 
 INSERT INTO ensemble (genre, max_students, min_students, level, instructor_id, start_time, end_time, date, price, pay)
-            VALUES  ('afrobeat', 30, 10, 'beginner', 1, '09:00', '12:00', '2020-12-13', 120, 150),
-                    ('post-dubstep', 30, 10, 'intermediate', 1, '10:00', '12:00', '2020-12-14', 120, 150),
-                    ('metalcore', 30, 10, 'advanced', 3, '14:00', '16:00', '2020-12-15', 150, 200);
+            VALUES  ('afrobeat', 30, 10, 'beginner', 1, '09:00', '12:00', '2020-10-13', 120, 150),
+                    ('post-dubstep', 30, 10, 'intermediate', 1, '10:00', '12:00', '2020-10-14', 120, 150),
+                    ('metalcore', 30, 10, 'advanced', 3, '14:00', '16:00', '2020-10-15', 150, 200);
 
 
 COMMIT;

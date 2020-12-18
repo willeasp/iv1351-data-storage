@@ -56,8 +56,8 @@ ORDER BY
 The same as above, but retrieve the average number of rentals per month 
 during the entire year, instead of the total for each month. 
 */
-
-/* Average rentals of each instrument per month */
+/* 
+-- Average rentals of each instrument per month
 SELECT 
     "Instrument",
     CAST(AVG("Rentals") AS DECIMAL(10, 2)) AS "Average"
@@ -81,7 +81,7 @@ GROUP BY
     "Instrument"
 
 UNION ALL
-/* Get average of all instruments across all months */
+-- Get average of all instruments across all months
 SELECT
     'ALL' AS "Instrument",
     CAST(AVG("Rented") AS DECIMAL(10, 2)) AS "Average" 
@@ -95,7 +95,7 @@ FROM (
         EXTRACT(YEAR FROM start_date) = 2020
     GROUP BY
         "Month" 
-) AS rentals;
+) AS rentals; */
 
 /* ACTUAL OUTPUT
  Instrument | Average
@@ -105,7 +105,6 @@ FROM (
  violin     |    1.50
  ALL        |    1.80
   */
-
 
 
 /********************************************************************************************************************/
@@ -118,24 +117,32 @@ the specific number of individual lessons, group lessons and ensembles. This
 query is expected to be performed a few times per week. 
 */
 
-/* SELECT * FROM individual_lesson;
-SELECT * FROM group_lesson;
-SELECT * FROM ensemble;
+/* select  TO_CHAR(date, 'Month') AS month, 
+        sum(i) i_lessons, 
+        sum(g) g_lessons, 
+        sum(e) ensembles, 
+        sum(t) total
+    from (
+        select date, i, g, e, t
+            from (select date, 1 i, 0 g, 0 e, 1 t
+                from individual_lesson) a1
+                union 
+                (select date m, 0 i, 1 g, 0 e, 1 t
+                from group_lesson )
+                union 
+                (select date m, 0 i, 0 g, 1 e, 1 t
+                from ensemble ) ) a2
+    where 
+        EXTRACT(YEAR FROM date) = 2020
+    group by month 
+    order by month; */
 
-SELECT  COALESCE("Month", 'Total') AS "Month", 
-        SUM("count") FROM (
-    SELECT TO_CHAR("date", 'Mon') AS "Month", 
-        COUNT(*) FROM individual_lesson 
-        GROUP BY "Month"
-    UNION ALL
-        SELECT TO_CHAR("date", 'Mon') AS "Month", COUNT(*) FROM group_lesson GROUP BY "Month"
-    UNION ALL
-        SELECT TO_CHAR("date", 'Mon') AS "Month", COUNT(*) FROM ensemble GROUP BY "Month"
-) AS lessons
-GROUP BY ROLLUP("Month")
-
-;
- */
+/* 
+   month   | i_lessons | g_lessons | ensembles | total
+-----------+-----------+-----------+-----------+-------
+ December  |         3 |         0 |         0 |     3
+ November  |         0 |         3 |         0 |     3
+ October   |         0 |         0 |         3 |     3 */
 
 
 /********************************************************************************************************************/
@@ -144,6 +151,8 @@ GROUP BY ROLLUP("Month")
 4. NOT FINISHED
 The same as above, but retrieve the average number of lessons per month
 during the entire year, instead of the total for each month. */
+
+
 
 
 /********************************************************************************************************************/
