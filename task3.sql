@@ -56,7 +56,7 @@ ORDER BY
 The same as above, but retrieve the average number of rentals per month 
 during the entire year, instead of the total for each month. 
 */
-/* 
+
 -- Average rentals of each instrument per month
 SELECT 
     "Instrument",
@@ -80,7 +80,7 @@ FROM (
 GROUP BY    
     "Instrument"
 
-UNION ALL
+/* UNION ALL
 -- Get average of all instruments across all months
 SELECT
     'ALL' AS "Instrument",
@@ -95,12 +95,12 @@ FROM (
         EXTRACT(YEAR FROM start_date) = 2020
     GROUP BY
         "Month" 
-) AS rentals; */
+) AS rentals */;
 
-/* ACTUAL OUTPUT
+/* OUTPUT
  Instrument | Average
 ------------+---------
- guitar     |    1.50
+ guitar     |    1.50 detta är fan konstigt du
  trumpet    |    1.50
  violin     |    1.50
  ALL        |    1.80
@@ -151,8 +151,6 @@ query is expected to be performed a few times per week.
 4. NOT FINISHED
 The same as above, but retrieve the average number of lessons per month
 during the entire year, instead of the total for each month. */
-
-
 
 
 /********************************************************************************************************************/

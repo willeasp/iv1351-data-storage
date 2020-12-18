@@ -117,12 +117,12 @@ INSERT INTO rental (start_date, end_date, student_id, ri_id)
             VALUES  ('2020-01-01', '2020-02-01', 1, 1),
                     ('2020-01-01', '2020-02-01', 1, 2),
                     ('2020-02-01', '2020-03-01', 1, 3),
-                    ('2020-02-01', '2021-03-01', 2, 4),
-                    ('2020-03-01', '2021-04-01', 2, 5),
-                    ('2020-03-01', '2021-04-01', 2, 6),
-                    ('2020-04-01', '2021-05-01', 3, 7),
-                    ('2020-04-01', '2021-05-01', 3, 8),
-                    ('2020-05-01', '2021-06-01', 3, 9);
+                    ('2020-02-01', '2020-03-01', 2, 4),
+                    ('2020-03-01', '2020-04-01', 2, 5),
+                    ('2020-03-01', '2020-04-01', 2, 6),
+                    ('2020-04-01', '2020-05-01', 3, 7),
+                    ('2020-04-01', '2020-05-01', 3, 8),
+                    ('2020-05-01', '2020-06-01', 3, 9);
 
 
 /* Insert 3 instruments */
@@ -135,16 +135,16 @@ INSERT INTO instrument (name, type)
 /* Insert 9 lessons */
 INSERT INTO individual_lesson (instrument_id, level, instructor_id, student_id, start_time, end_time, date, price, pay)
             VALUES  (1, 'beginner', 1, 1, '10:00', '11:00', '2020-12-10', 150, 120),
-                    (2, 'intermediate', 2, 2, '11:00', '12:00', '2020-12-13', 150, 120),
+                    (2, 'intermediate', 2, 2, '11:00', '12:00', '2020-04-13', 150, 120),
                     (3, 'advanced', 3, 3, '09:00', '11:00', '2020-12-15', 180, 150);
 
 INSERT INTO group_lesson (instrument_id, level, instructor_id, max_students, min_students, start_time, end_time, date, price, pay)
-            VALUES  (1, 'beginner', 1, 15, 5, '14:00', '15:30', '2020-11-13', 100, 120),
+            VALUES  (1, 'beginner', 1, 15, 5, '14:00', '15:30', '2020-02-13', 100, 120),
                     (2, 'intermediate', 2, 20, 8, '15:00', '17:00', '2020-11-20', 100, 120),
                     (3, 'advanced', 3, 8, 3, '13:00', '15:30', '2020-11-10', 120, 150);
 
 INSERT INTO ensemble (genre, max_students, min_students, level, instructor_id, start_time, end_time, date, price, pay)
-            VALUES  ('afrobeat', 30, 10, 'beginner', 1, '09:00', '12:00', '2020-10-13', 120, 150),
+            VALUES  ('afrobeat', 30, 10, 'beginner', 1, '09:00', '12:00', '2020-06-13', 120, 150),
                     ('post-dubstep', 30, 10, 'intermediate', 1, '10:00', '12:00', '2020-10-14', 120, 150),
                     ('metalcore', 30, 10, 'advanced', 3, '14:00', '16:00', '2020-10-15', 150, 200);
 
