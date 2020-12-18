@@ -58,7 +58,7 @@ during the entire year, instead of the total for each month.
 */
 
 -- Average rentals of each instrument per month
-SELECT 
+/* SELECT 
     "Instrument",
     CAST(AVG("Rentals") AS DECIMAL(10, 2)) AS "Average"
 FROM (
@@ -66,19 +66,32 @@ FROM (
         TO_CHAR(r.start_date,'Mon') AS "Month",
         ri.name AS "Instrument",
         COUNT(*) AS "Rentals"
-    FROM 
-        rental AS r
-    JOIN 
-        rental_instrument AS ri
-    ON 
-        r.ri_id = ri.ri_id
-    WHERE
-        EXTRACT(YEAR FROM start_date) = 2020
-    GROUP BY 
-        "Month", "Instrument"
+        FROM 
+            rental AS r
+        JOIN 
+            rental_instrument AS ri
+        ON 
+            r.ri_id = ri.ri_id
+        WHERE
+            EXTRACT(YEAR FROM start_date) = 2020
+        GROUP BY 
+            "Month", "Instrument"
+    UNION
+    SELECT 
+        TO_CHAR(date '1970-01-01' + interval '1' month * s.a, 'Mon') AS month,
+        '' "Intrument",
+        0 "Rentals"
+        FROM generate_series(0,11,1) AS s(a)
 ) AS rentals
 GROUP BY    
-    "Instrument"
+    "Instrument" */
+
+SELECT 
+        TO_CHAR(date '1970-01-01' + interval '1' month * s.a, 'Mon') AS month,
+        instrument
+        FROM generate_series(0,11,1) AS s(a)
+        inner join lateral (select name from instrument) as q
+        ;
 
 /* UNION ALL
 -- Get average of all instruments across all months
