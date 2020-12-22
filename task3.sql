@@ -9,7 +9,7 @@ guitar, trumpet, etc). The latter list shall be sorted BY number of rentals.
 This query is expected to be performed a few times per week. 
 */
 
-SELECT  COALESCE("month", 'ALL') AS month, 
+/* SELECT  COALESCE("month", 'ALL') AS month, 
         COALESCE("instrument", 'TOTAL') AS instrument,
         rentals 
 FROM    (
@@ -29,7 +29,7 @@ FROM    (
         ROLLUP(month), ROLLUP(instrument)
 ) AS query
 ORDER BY 
-    rentals DESC;
+    rentals DESC; */
 
 /* 
    Month   | Instrument | Rentals
@@ -57,7 +57,7 @@ The same as above, but retrieve the average number of rentals per month
 during the entire year, instead of the total for each month. 
 */
 
-SELECT 
+/* SELECT 
     COALESCE("instrument", 'ALL') AS instrument,
     CAST(COUNT(*) /12.0 AS DECIMAL(10,2)) AS avg_rentals
 FROM (
@@ -73,7 +73,7 @@ FROM (
 GROUP BY 
     ROLLUP(instrument)
 ORDER BY
-    avg_rentals;
+    avg_rentals; */
 
 
 /********************************************************************************************************************/
@@ -87,7 +87,7 @@ query is expected to be performed a few times per week.
 */
 
 
-SELECT  COALESCE("month", 'ALL') AS month,
+/* SELECT  COALESCE("month", 'ALL') AS month,
         SUM(i) i_lessons, 
         SUM(g) g_lessons, 
         SUM(e) ensembles, 
@@ -120,7 +120,7 @@ WHERE
     year = 2020 
 
 GROUP BY ROLLUP(month)
-ORDER BY total DESC;
+ORDER BY total DESC; */
 
 /* 
    month   | i_lessons | g_lessons | ensembles | total
@@ -137,7 +137,7 @@ ORDER BY total DESC;
 The same as above, but retrieve the average number of lessons per month
 during the entire year, instead of the total for each month. */
 
-SELECT  EXTRACT(YEAR FROM date) AS year, 
+/* SELECT  EXTRACT(YEAR FROM date) AS year, 
         CAST(SUM(i) /12.0 AS DECIMAL(10,2)) AS i_lessons, 
         CAST(SUM(g) /12.0 AS DECIMAL(10,2)) AS g_lessons, 
         CAST(SUM(e) /12.0 AS DECIMAL(10,2)) AS ensembles, 
@@ -167,7 +167,7 @@ SELECT  EXTRACT(YEAR FROM date) AS year,
     WHERE 
         EXTRACT(YEAR FROM date) = 2020
     GROUP BY year
-    ORDER BY year;
+    ORDER BY year; */
 
 
 /********************************************************************************************************************/
@@ -182,7 +182,7 @@ find instructors risking to work too much, and will be executed daily. */
 
 
 -- Get the 3 instructors with the most amount of lessons
-(SELECT
+/* (SELECT
     instructor_id AS instructor,
     COUNT(instructor_id) AS given_lessons
 FROM (
@@ -242,5 +242,65 @@ GROUP BY
     instructor
 HAVING
     COUNT(instructor_id) >= 2
-ORDER BY given_lessons DESC;
+ORDER BY given_lessons DESC; */
 
+
+/* ************************************************************************************ */
+/* ************************************************************************************ */
+/* ************************************************************************************ */
+
+/* 
+The following queries will be performed programmatically, and the results will be 
+displayed on Soundgood's web page. You only have to create the queries, not the web page. */
+
+/* 
+6.
+List all ensembles held during the next week, sorted by music genre and weekday. For each 
+ensemble tell whether it's full booked, has 1-2 seats left or has more seats left.*/
+
+SELECT 
+    genre, 
+    TO_CHAR(date, 'Day') AS weekday,
+    CASE 
+        WHEN COUNT(student_id) = max_students
+            THEN 'Full booked'
+        WHEN COUNT(student_id) = max_students -2
+            THEN '2 seats left'
+        WHEN COUNT(student_id) = max_students -1
+            THEN '1 seat left'
+        ELSE
+            'Many seats left'
+    END AS places_left
+FROM (
+    SELECT 
+        genre, 
+        date,
+        student_id,
+        max_students
+    FROM
+        ensemble AS en
+    LEFT OUTER JOIN
+        ensemble_lesson_student AS els
+    ON 
+        en.ensemble_id = els.ensemble_id
+    GROUP BY
+        genre,
+        date,
+        student_id,
+        max_students
+) AS ensembles
+WHERE 
+    date >= DATE_TRUNC('week', CURRENT_DATE)
+GROUP BY
+    genre,
+    date,
+    max_students
+ORDER BY
+    genre,
+    date;
+
+
+/* 
+List the three instruments with the lowest monthly rental fee. For each instrument tell 
+whether it is rented or available to rent. Also tell when the next group lesson for each
+listed instrument is scheduled. */

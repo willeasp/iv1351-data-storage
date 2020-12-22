@@ -179,12 +179,12 @@ INSERT INTO group_lesson (instrument_id, level, instructor_id, max_students, min
                     (3, 'advanced', 3, 8, 3, '13:00', '15:30', '2020-11-10', 120, 150);
 
 INSERT INTO ensemble(genre, max_students, min_students, level, instructor_id, start_time, end_time, date, price, pay)
-            VALUES  ('afrobeat',        5,  2, 'beginner',     1, '09:00', '12:00', '2020-06-13', 120, 150),
-                    ('post-dubstep',    5,  2, 'intermediate', 1, '10:00', '12:00', '2020-10-14', 120, 150),
-                    ('metalcore',       5,  2, 'advanced',     3, '14:00', '16:00', '2020-10-15', 150, 200),
-                    ('afrobeat',        5,  2, 'beginner',     1, '09:00', '12:00', '2020-12-13', 120, 150),
-                    ('post-dubstep',    5,  2, 'intermediate', 2, '10:00', '12:00', '2020-12-14', 120, 150),
-                    ('metalcore',       5,  2, 'advanced',     3, '14:00', '16:00', '2020-12-15', 150, 200);
+            VALUES  ('afrobeat',        5,  2, 'beginner',     1, '09:00', '12:00', '2020-12-21', 120, 150),
+                    ('post-dubstep',    5,  2, 'intermediate', 1, '10:00', '12:00', '2020-12-22', 120, 150),
+                    ('metalcore',       5,  2, 'advanced',     3, '14:00', '16:00', '2020-12-23', 150, 200),
+                    ('afrobeat',        5,  2, 'beginner',     1, '09:00', '12:00', '2020-12-24', 120, 150),
+                    ('post-dubstep',    5,  2, 'intermediate', 2, '10:00', '12:00', '2020-12-25', 120, 150),
+                    ('metalcore',       5,  2, 'advanced',     3, '14:00', '16:00', '2020-12-26', 150, 200);
 
 
 /* Insert students into ensembles */
