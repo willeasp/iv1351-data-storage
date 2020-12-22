@@ -133,15 +133,15 @@ INSERT INTO instructor (person_id, teaches_ensembles)
 /* Insert 9 rental instruments */
 
 INSERT INTO rental_instrument(name, type, brand, monthly_cost)
-/* 1 */      VALUES ('guitar', 'string', 'Epiphone', 399.99),
-/* 2 */             ('guitar', 'string', 'Gibson', 399.99),
-/* 3 */             ('guitar', 'string', 'Yamaha', 399.99),
-/* 4 */             ('violin', 'string', 'Stentor', 299.99),
-/* 5 */             ('violin', 'string', 'Knilling', 299.99),
-/* 6 */             ('violin', 'string', 'Cremona', 299.99),
-/* 7 */             ('trumpet', 'wind', 'Yamaha', 349.99),
-/* 8 */             ('trumpet', 'wind', 'Getzen', 349.99),
-/* 9 */             ('trumpet', 'wind', 'Mendini', 349.99);
+/* 1 */      VALUES ('guitar',  'string',   'Epiphone', 289.99),
+/* 2 */             ('guitar',  'string',   'Gibson',   399.99),
+/* 3 */             ('guitar',  'string',   'Yamaha',   399.99),
+/* 4 */             ('violin',  'string',   'Stentor',  299.99),
+/* 5 */             ('violin',  'string',   'Knilling', 399.99),
+/* 6 */             ('violin',  'string',   'Cremona',  399.99),
+/* 7 */             ('trumpet', 'wind',     'Yamaha',   249.99),
+/* 8 */             ('trumpet', 'wind',     'Getzen',   349.99),
+/* 9 */             ('trumpet', 'wind',     'Mendini',  349.99);
 
 
 
@@ -161,22 +161,23 @@ INSERT INTO rental (start_date, end_date, student_id, ri_id)
 
 /* Insert 3 instruments */
 INSERT INTO instrument (name, type)
-            VALUES ('guitar', 'string'), /* 1 */
-                    ('piano', 'keys'), /* 2 */
-                    ('saxophone', 'wind'); /* 3 */           
+            VALUES  ('guitar',  'string'),  /* 1 */
+                    ('violin',  'string'),  /* 2 */
+                    ('trumpet', 'wind');    /* 3 */           
 
 
 /* Insert 9 lessons */
 INSERT INTO individual_lesson (instrument_id, level, instructor_id, student_id, start_time, end_time, date, price, pay)
-            VALUES  (1, 'beginner', 1, 1, '10:00', '11:00', '2020-12-10', 150, 120),
-                    (2, 'intermediate', 2, 2, '11:00', '12:00', '2020-04-13', 150, 120),
-                    (2, 'intermediate', 2, 2, '17:00', '18:00', '2020-04-15', 150, 120),
-                    (3, 'advanced', 3, 3, '09:00', '11:00', '2020-12-15', 180, 150);
+            VALUES  (1, 'beginner',     1,  1, '10:00', '11:00', '2020-12-10', 150, 120),
+                    (2, 'intermediate', 2,  2, '11:00', '12:00', '2020-04-13', 150, 120),
+                    (2, 'intermediate', 2,  2, '17:00', '18:00', '2020-04-15', 150, 120),
+                    (3, 'advanced',     3,  3, '09:00', '11:00', '2020-12-15', 180, 150);
 
 INSERT INTO group_lesson (instrument_id, level, instructor_id, max_students, min_students, start_time, end_time, date, price, pay)
-            VALUES  (1, 'beginner', 1, 15, 5, '14:00', '15:30', '2020-02-13', 100, 120),
-                    (2, 'intermediate', 2, 20, 8, '15:00', '17:00', '2020-11-20', 100, 120),
-                    (3, 'advanced', 3, 8, 3, '13:00', '15:30', '2020-11-10', 120, 150);
+            VALUES  (1, 'beginner',     1,  5,  2, '14:00', '15:30', '2020-12-23', 100, 120),
+                    (2, 'intermediate', 2,  5,  2, '15:00', '17:00', '2020-12-24', 100, 120),
+                    (3, 'advanced',     3,  5,  2, '13:00', '15:30', '2020-12-25', 120, 150),
+                    (3, 'advanced',     3,  5,  2, '13:00', '15:30', '2020-12-26', 120, 150);
 
 INSERT INTO ensemble(genre, max_students, min_students, level, instructor_id, start_time, end_time, date, price, pay)
             VALUES  ('afrobeat',        5,  2, 'beginner',     1, '09:00', '12:00', '2020-12-21', 120, 150),

@@ -254,10 +254,10 @@ The following queries will be performed programmatically, and the results will b
 displayed on Soundgood's web page. You only have to create the queries, not the web page. */
 
 /* 
-6.
+6.  FINISHED
 List all ensembles held during the next week, sorted by music genre and weekday. For each 
 ensemble tell whether it's full booked, has 1-2 seats left or has more seats left.*/
-
+/* 
 SELECT 
     genre, 
     TO_CHAR(date, 'Day') AS weekday,
@@ -298,9 +298,43 @@ GROUP BY
 ORDER BY
     genre,
     date;
-
+ */
 
 /* 
+7. FINISHED
 List the three instruments with the lowest monthly rental fee. For each instrument tell 
 whether it is rented or available to rent. Also tell when the next group lesson for each
 listed instrument is scheduled. */
+
+SELECT 
+    i.name AS instrument,
+    ri.monthly_cost,
+    ri.ri_id AS ri_id,
+    CASE
+        WHEN r.student_id IS NULL 
+            THEN 'available'
+        ELSE 
+            'rented'
+    END AS status,
+    g.date AS next_group_lesson
+FROM 
+    rental_instrument AS ri
+NATURAL LEFT OUTER JOIN -- join by ri_id
+    rental AS r
+NATURAL LEFT OUTER JOIN -- join by instrument name, to get group lesson with that instrument
+    instrument AS i 
+NATURAL LEFT OUTER JOIN -- join by instrument_id
+(
+    SELECT      -- get soonest lesson for every instrument
+        instrument_id,
+        MIN(date) AS date
+    FROM 
+        group_lesson
+    GROUP BY
+        instrument_id
+) AS g
+WHERE
+    g.date >= DATE_TRUNC('week', CURRENT_DATE)
+ORDER BY
+    monthly_cost
+LIMIT 3;
