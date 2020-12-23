@@ -1,0 +1,30 @@
+version: "3.8"
+
+services: 
+  # container name
+  database:
+    container_name: dbsoundgood
+    # bind mounts volume
+    volumes: 
+      - /mnt/c/Users/Dell/Documents/Code/KTH/DataLagring/IV1351-Datalagring:/host_files
+    image: postgres
+    ports:
+      - 5432:5432
+    networks: 
+      - soundgood
+    environment: 
+      - POSTGRES_PASSWORD=example
+  
+  app:
+    container_name: appsoundgood
+    build: docker/
+    networks:
+      - soundgood
+    volumes: 
+      - /mnt/c/Users/Dell/Documents/Code/KTH/DataLagring/IV1351-Datalagring:/host_files
+    stdin_open: true
+    tty: true
+
+networks: 
+  soundgood:
+

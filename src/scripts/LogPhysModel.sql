@@ -1,10 +1,3 @@
-\c template1;
-DROP DATABASE soundgood;
-
-CREATE DATABASE soundgood;
-\c soundgood;
-
-
 
 BEGIN;
 
@@ -232,6 +225,3 @@ CREATE TABLE g_lesson_student (
 
 COMMIT;
 
-
-/* Populate data */
-\i /host_files/PopulateDataHardLink.sql;
