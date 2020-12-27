@@ -9,10 +9,13 @@ guitar, trumpet, etc). The latter list shall be sorted BY number of rentals.
 This query is expected to be performed a few times per week. 
 */
 
-/* SELECT  COALESCE("month", 'ALL') AS month, 
-        COALESCE("instrument", 'TOTAL') AS instrument,
-        rentals 
-FROM    (
+CREATE OR REPLACE VIEW RentalsPerMonth AS 
+SELECT  
+    COALESCE("month", 'ALL') AS month, 
+    COALESCE("instrument", 'TOTAL') AS instrument,
+    rentals 
+FROM    
+(
     SELECT  
         TO_CHAR(r.start_date, 'Month') AS month, 
         ri.name AS instrument, 
@@ -29,15 +32,15 @@ FROM    (
         ROLLUP(month), ROLLUP(instrument)
 ) AS query
 ORDER BY 
-    rentals DESC; */
+    rentals DESC;
 
 /* 
    Month   | Instrument | Rentals
 -----------+------------+---------
- February  | violin     |       1
- May       | trumpet    |       1
- May       | TOTAL      |       1
- February  | guitar     |       1
+ ALL       | TOTAL      |       9
+ ALL       | guitar     |       3
+ ALL       | violin     |       3
+ ALL       | trumpet    |       3
  April     | TOTAL      |       2
  March     | TOTAL      |       2
  February  | TOTAL      |       2
@@ -45,10 +48,11 @@ ORDER BY
  January   | guitar     |       2
  March     | violin     |       2
  April     | trumpet    |       2
- ALL       | guitar     |       3
- ALL       | violin     |       3
- ALL       | trumpet    |       3
- ALL       | TOTAL      |       9*/
+ February  | violin     |       1
+ May       | trumpet    |       1
+ May       | TOTAL      |       1
+ February  | guitar     |       1
+ */
 /********************************************************************************************************************/
 
 /* 
@@ -57,6 +61,7 @@ The same as above, but retrieve the average number of rentals per month
 during the entire year, instead of the total for each month. 
 */
 
+CREATE OR REPLACE VIEW RentalsMonthlyAverage AS 
 SELECT 
     COALESCE("instrument", 'ALL') AS instrument,
     CAST(COUNT(*) /12.0 AS DECIMAL(10,2)) AS avg_rentals
@@ -89,13 +94,15 @@ the specific number of individual lessons, group lessons and ensembles. This
 query is expected to be performed a few times per week. 
 */
 
-
-SELECT  COALESCE("month", 'ALL') AS month,
-        SUM(i) i_lessons, 
-        SUM(g) g_lessons, 
-        SUM(e) ensembles, 
-        SUM(t) total
-FROM (
+CREATE OR REPLACE VIEW LessonsPerMonth AS
+SELECT  
+    COALESCE("month", 'ALL') AS month,
+    SUM(i) i_lessons, 
+    SUM(g) g_lessons, 
+    SUM(e) ensembles, 
+    SUM(t) total
+FROM 
+(
     SELECT 
         EXTRACT(YEAR FROM date) AS year,
         TO_CHAR(date, 'Month') AS month,
@@ -140,6 +147,7 @@ ORDER BY total DESC;
 The same as above, but retrieve the average number of lessons per month
 during the entire year, instead of the total for each month. */
 
+CREATE OR REPLACE VIEW LessonsMonthlyAverage AS 
 SELECT  EXTRACT(YEAR FROM date) AS year, 
         CAST(SUM(i) /12.0 AS DECIMAL(10,2)) AS i_lessons, 
         CAST(SUM(g) /12.0 AS DECIMAL(10,2)) AS g_lessons, 
@@ -183,7 +191,7 @@ three instructors having given most lessons (independent of lesson type) during
 the last month, sorted BY number of given lessons. This query will be used to 
 find instructors risking to work too much, and will be executed daily. */
 
-
+CREATE OR REPLACE VIEW InstructorOverworkingStatus AS
 -- Get the 3 instructors with the most amount of lessons
 (SELECT
     instructor_id AS instructor,
@@ -261,6 +269,7 @@ displayed on Soundgood's web page. You only have to create the queries, not the 
 List all ensembles held during the next week, sorted by music genre and weekday. For each 
 ensemble tell whether it's full booked, has 1-2 seats left or has more seats left.*/
 
+CREATE OR REPLACE VIEW EnsemblesNextWeek AS 
 SELECT 
     genre, 
     TO_CHAR(date, 'Day') AS weekday,
@@ -309,6 +318,7 @@ List the three instruments with the lowest monthly rental fee. For each instrume
 whether it is rented or available to rent. Also tell when the next group lesson for each
 listed instrument is scheduled. */
 
+CREATE OR REPLACE VIEW AvailableInstruments AS
 SELECT 
     i.name AS instrument,
     ri.monthly_cost,
