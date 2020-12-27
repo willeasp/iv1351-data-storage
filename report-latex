@@ -100,6 +100,11 @@ For tables representing multi-valued attributes, the PK of the “parent” was 
 
 Lastly, the model was verified to be normalized and that it was possible to perform all planned operations on the data.
 
+\section{Task 3, Queries and Data Serialization}
+The DBMS used in this task is PostgreSQL, in a docker container. The editor used to develop SQL queries is Visual Studio Code. The code was developed in a script and ran inside a psql instance in the docker container. 
+To verify that the code worked as intended, multiple runs was made with different data in the tables. Edge cases was explored and the query was tried to be “broken”, meaning that runs was made with data that could if the query was not sufficient, produce wrong results. 
+While testing other queries, ones that had already been tested was also tested again, to make sure again that the results made sense with the new data. 
+To verify that the tests was correct, the correct answer had to be manually calculated, as in the desired result was calculated, and then compared to the result.
 
 
    
@@ -115,6 +120,11 @@ Lastly, the model was verified to be normalized and that it was possible to perf
 The conceptual model as seen above in figure \ref{fig:conceptual-model} uses inheritance from Person to Student and Instructor. This is done because both student and instructor share some attributes. At the same way, RentalInstrument inherits Instrument. This is done because RentalInstrument is seen as a physical object, it has attributes that are used in the “real world”, while Instrument is just seen as the “idea” of an instrument, or simply what type of instrument it is. This is done to make a difference of an instrument that a person plays (you can say you play an instrument but you don't necessarily own it), and when a person rents an instrument.
 Some places in the model you can see the keyword DERIVED. This means that the attribute is calculated by other things in the diagram.
 
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{LogPhys Model 2 student update.png}
+    \caption{Logical-Physical model diagram.}
+    \label{fig:logphys-model}
+\end{figure}
 \section{Task 2, Logical And Physical Model}
 The logical model result can be seen in figure \ref{fig:logphys-model}.
 
@@ -130,11 +140,91 @@ The database has persons, that can be a student, instructor or both. The student
 Instrument is connected to multiple lessons, to be able to know what lessons are using a specific instrument. Instrument and instructor, student also has a many-to-many relationship to be able to find both what instructors plays a specific instrument and what instruments a specific instructor plays. Person was chosen to still be in the model, since it might be of interest to keep all the persons currently in the database, aside from the student and instructor information.
 
 
-\begin{figure}[h]
-    \includegraphics[width=\textwidth]{LogPhys Model 2 student update.png}
-    \caption{Logical-Physical model diagram.}
-    \label{fig:logphys-model}
-\end{figure}
+
+\section{Task 3, Queries and Data Serialization}
+The following bold text is the instruction for the query to be made. After each description an explanation will be made of how the query was made.
+\\~\\
+
+
+\textbf{Show the number of instruments rented per month during a specified year. It shall be possible to retrieve the total number of rented instruments (just one number) and rented instruments of each kind (one number per kind, guitar, trumpet, etc). The latter list shall be sorted by number of rentals. This query is expected to be performed a few times per week.}
+\par
+Link to Github can be found \underline{\href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring/blob/a708e00833d09854fd7cab0bcb9b94f11ba210fb/src/scripts/task3.sql#L4}{here}}.
+This query works by getting the number of rentals for each instrument per month, and then using the COALESCE function to get the total for all instruments per month, as well as the total for all months.
+The inner select statement is used to be able to use the COALESCE function, which fills in NULL spaces with a default value. 
+The testing was made by changing the year that is used, and seeing that no data appears since no rentals was made in 2021. 
+\\~\\
+
+
+
+\textbf{The same as above, but retrieve the average number of rentals per month 
+during the entire year, instead of the total for each month.}
+\par
+Link to Github can be found \underline{\href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring/blob/a708e00833d09854fd7cab0bcb9b94f11ba210fb/src/scripts/task3.sql#L55}{here}}.
+This query works by first selecting all instrument rental per month, and then aggregating that into an average for the whole year per instrument, as well as all instruments.
+The testing was made by checking the year that the average was calculated on was correct, as well as checking that the average calculated on all rentals was correct.
+\\~\\
+
+
+\textbf{Show the number of lessons given per month during a specified year. It shall 
+be possible to retrieve the total number of lessons (just one number) and 
+the specific number of individual lessons, group lessons and ensembles. This 
+query is expected to be performed a few times per week. 
+}
+\par
+Link to Github can be found \underline{\href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring/blob/a708e00833d09854fd7cab0bcb9b94f11ba210fb/src/scripts/task3.sql#L82}{here}}.
+This query was interesting to make. The goal was to get each lesson type in its own column, so that the number of lessons per month could be read on one line. This was done by counting the number of times each lesson appeared. This was done by selecting every date a lesson appeared, and creating custom columns, one per type of lesson, and one total column. The column with the type of lesson that the table contained, was put in a 1, and the others was put as zero, and the total was also put sa 1. The when the SUM function summed up the number of lessons per month, the number of lessons per month appeared in the respective column. The negative thing about the query is that it became three nested SELECTs.
+
+This was tested by adding lessons in multiple months, years and days.
+\\~\\
+
+
+
+\textbf{The same as above, but retrieve the average number of lessons per month
+during the entire year, instead of the total for each month.
+}
+\par
+Link to Github can be found \underline{\href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring/blob/a708e00833d09854fd7cab0bcb9b94f11ba210fb/src/scripts/task3.sql#L136}{here}}.
+This query works the same as the query before, except that the average was calculated over the sum function. 
+This was tested by adding lessons in multiple months, years and days and seeing that it worked for all cases.
+\\~\\
+
+
+\textbf{List all instructors who has given more than a specific number of lessons
+during the current month. SUM all lessons, independent of type. Also list the 
+three instructors having given most lessons (independent of lesson type) during 
+the last month, sorted BY number of given lessons. This query will be used to 
+find instructors risking to work too much, and will be executed daily.
+}
+\par
+Link to Github can be found \underline{\href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring/blob/a708e00833d09854fd7cab0bcb9b94f11ba210fb/src/scripts/task3.sql#L176}{here}}.
+This query became long, since the three instructors that worked the most was going to be visible, even if the limit of how many lessons they should have made to be displayed was higher than the three. 
+Since no better solution was found, this query was solved by doing a union between two selects that worked very similarly. The first select gets the 3 instructors that worked the most, and the second select gets all instructors that have worked more than the specified number of lessons.
+
+This was tested by having fewer instructors than three that had higher than the specified number of lessons, and three instructors still was displayed. The test also worked with having more than three instructors displaying, with no duplicate rows being displayed. 
+\\~\\
+
+
+\textbf{List all ensembles held during the next week, sorted by music genre and weekday. For each 
+ensemble tell whether it's full booked, has 1-2 seats left or has more seats left.
+}
+\par
+Link to Github can be found \underline{\href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring/blob/a708e00833d09854fd7cab0bcb9b94f11ba210fb/src/scripts/task3.sql#L257}{here}}.
+This task was solved by getting the details of each ensemble, together with all students that entered that ensemble. Genre, date, student\_id and max\_student was collected, and then that was filtered with a select case to see how many places was left on the ensemble, and then printed a message about that. The date was checked by the date\_trunc method, which takes the current date, and then returns the date of the first day of the current week. The date of each ensemble is then checked to be after this date.
+
+This query was tested by having ensembles on different dates, having different number of students, and changing the max\_students of each ensemble.
+\\~\\
+
+
+\textbf{List the three instruments with the lowest monthly rental fee. For each instrument tell 
+whether it is rented or available to rent. Also tell when the next group lesson for each
+listed instrument is scheduled.
+}
+\par
+Link to Github can be found \underline{\href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring/blob/a708e00833d09854fd7cab0bcb9b94f11ba210fb/src/scripts/task3.sql#L304}{here}}.
+This task was solved by joining together rental, rental\_instrument, instrument and group\_lesson. From group\_lesson, the soonest date for each instrument was chosen. The result was ordered by monthly\_fee and then limited to three rows. 
+
+This was tested by having lessons in multiple dates, both before and after the current date. For a rental\_instrument, it was tested to see whether it would be available or rented, based on the date it was rented as well as if it didn’t exist in the rental table. Multiple instances of the same type of instrument, but different rental\_instrument appears in the rental table. 
+\par
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

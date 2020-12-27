@@ -57,7 +57,7 @@ The same as above, but retrieve the average number of rentals per month
 during the entire year, instead of the total for each month. 
 */
 
-/* SELECT 
+SELECT 
     COALESCE("instrument", 'ALL') AS instrument,
     CAST(COUNT(*) /12.0 AS DECIMAL(10,2)) AS avg_rentals
 FROM (
@@ -68,12 +68,15 @@ FROM (
         rental_instrument AS ri
     INNER JOIN  
         rental AS r
-    ON r.ri_id = ri.ri_id
-    ) AS rentals
+    ON 
+        r.ri_id = ri.ri_id
+    WHERE
+        EXTRACT(YEAR FROM r.start_date) >= 2020
+) AS rentals
 GROUP BY 
     ROLLUP(instrument)
 ORDER BY
-    avg_rentals; */
+    avg_rentals;
 
 
 /********************************************************************************************************************/
@@ -87,7 +90,7 @@ query is expected to be performed a few times per week.
 */
 
 
-/* SELECT  COALESCE("month", 'ALL') AS month,
+SELECT  COALESCE("month", 'ALL') AS month,
         SUM(i) i_lessons, 
         SUM(g) g_lessons, 
         SUM(e) ensembles, 
@@ -120,7 +123,7 @@ WHERE
     year = 2020 
 
 GROUP BY ROLLUP(month)
-ORDER BY total DESC; */
+ORDER BY total DESC;
 
 /* 
    month   | i_lessons | g_lessons | ensembles | total
@@ -137,7 +140,7 @@ ORDER BY total DESC; */
 The same as above, but retrieve the average number of lessons per month
 during the entire year, instead of the total for each month. */
 
-/* SELECT  EXTRACT(YEAR FROM date) AS year, 
+SELECT  EXTRACT(YEAR FROM date) AS year, 
         CAST(SUM(i) /12.0 AS DECIMAL(10,2)) AS i_lessons, 
         CAST(SUM(g) /12.0 AS DECIMAL(10,2)) AS g_lessons, 
         CAST(SUM(e) /12.0 AS DECIMAL(10,2)) AS ensembles, 
@@ -167,7 +170,7 @@ during the entire year, instead of the total for each month. */
     WHERE 
         EXTRACT(YEAR FROM date) = 2020
     GROUP BY year
-    ORDER BY year; */
+    ORDER BY year;
 
 
 /********************************************************************************************************************/
@@ -182,7 +185,7 @@ find instructors risking to work too much, and will be executed daily. */
 
 
 -- Get the 3 instructors with the most amount of lessons
-/* (SELECT
+(SELECT
     instructor_id AS instructor,
     COUNT(instructor_id) AS given_lessons
 FROM (
@@ -242,7 +245,7 @@ GROUP BY
     instructor
 HAVING
     COUNT(instructor_id) >= 2
-ORDER BY given_lessons DESC; */
+ORDER BY given_lessons DESC;
 
 
 /* ************************************************************************************ */
@@ -257,7 +260,7 @@ displayed on Soundgood's web page. You only have to create the queries, not the 
 6.  FINISHED
 List all ensembles held during the next week, sorted by music genre and weekday. For each 
 ensemble tell whether it's full booked, has 1-2 seats left or has more seats left.*/
-/* 
+
 SELECT 
     genre, 
     TO_CHAR(date, 'Day') AS weekday,
@@ -298,7 +301,7 @@ GROUP BY
 ORDER BY
     genre,
     date;
- */
+
 
 /* 
 7. FINISHED
@@ -319,8 +322,17 @@ SELECT
     g.date AS next_group_lesson
 FROM 
     rental_instrument AS ri
-NATURAL LEFT OUTER JOIN -- join by ri_id
-    rental AS r
+NATURAL LEFT OUTER JOIN -- join by ri_id, where the rental is active
+(
+    SELECT *
+    FROM
+        rental AS r
+    WHERE
+        CURRENT_DATE >= r.start_date
+        AND
+        CURRENT_DATE < r.end_date
+
+) AS r
 NATURAL LEFT OUTER JOIN -- join by instrument name, to get group lesson with that instrument
     instrument AS i 
 NATURAL LEFT OUTER JOIN -- join by instrument_id
@@ -330,11 +342,19 @@ NATURAL LEFT OUTER JOIN -- join by instrument_id
         MIN(date) AS date
     FROM 
         group_lesson
+    WHERE
+        date >= DATE_TRUNC('day', CURRENT_DATE)
     GROUP BY
         instrument_id
 ) AS g
-WHERE
-    g.date >= DATE_TRUNC('week', CURRENT_DATE)
 ORDER BY
     monthly_cost
 LIMIT 3;
+
+/* 
+ instrument | monthly_cost | ri_id | status | next_group_lesson
+------------+--------------+-------+--------+-------------------
+ trumpet    |       249.99 |     7 | rented |
+ guitar     |       289.99 |     1 | rented |
+ violin     |       299.99 |     4 | rented |
+  */
