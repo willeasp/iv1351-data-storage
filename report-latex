@@ -73,6 +73,8 @@ The literature used to prepare for the task was to view the lectures supplied ab
 
 The lectures were about logical and physical modeling, and an intersection between the two that were to be made in the task. The lectures also covered steps on how to convert the conceptual model to the LogPhys Model.
 
+\section{Task 3, Queries and Data Serialization}
+The information collected before starting development was the lecture SQL - The Structured Query Language, held for the project course. The lecture taught creating a database, querying the database, architecture of the database, data manipulation and views. 
 
 
 \chapter{Method}
@@ -221,7 +223,7 @@ listed instrument is scheduled.
 }
 \par
 Link to Github can be found \underline{\href{https://gits-15.sys.kth.se/wasp/IV1351-Datalagring/blob/a708e00833d09854fd7cab0bcb9b94f11ba210fb/src/scripts/task3.sql#L304}{here}}.
-This task was solved by joining together rental, rental\_instrument, instrument and group\_lesson. From group\_lesson, the soonest date for each instrument was chosen. The result was ordered by monthly\_fee and then limited to three rows. 
+This task was interpreted to be meant to list the three cheapest rental instruments, even if they are the same kind of instrument. This task was solved by joining together rental, rental\_instrument, instrument and group\_lesson. From group\_lesson, the soonest date for each instrument was chosen. The result was ordered by monthly\_fee and then limited to three rows. 
 
 This was tested by having lessons in multiple dates, both before and after the current date. For a rental\_instrument, it was tested to see whether it would be available or rented, based on the date it was rented as well as if it didn’t exist in the rental table. Multiple instances of the same type of instrument, but different rental\_instrument appears in the rental table. 
 \par
@@ -279,6 +281,35 @@ There might not be a difference in the logical model depending on whether inheri
 The advantage of using inheritance is that it enables the database to store more general information, for example all persons that exist in a database. It is a better way to divide the same type of information in the database as well, since there aren’t many columns over many tables that store the exact same type of data. A problem that might arise is that the database becomes difficult to control using constraints, for example: The database contains superclass person for student and instructor. Should a person be able to exist without either a student or instructor? Can a person be both? Doing it this way makes it harder to figure out these types of constraints. Having inheritance also may help with keeping fewer relations, for example, should a person be related to “email” or should instructor and student both be related to email? 
 The advantage of not using inheritance is that there are fewer tables in the database to keep track of. It is not needed to query many tables to get information about a child entity. 
 
+
+\section{Task 3, Queries and Data Serialization}
+When deciding whether to or not to create a view or materialized view for each query, the thing to decide is if a kind of table is supposed to be created. A view or materialized view is made from a query of existing tables. The difference between a view and a materialized view is that a view is a table that is computed from the query every time it is called, but a materialized view is a table from the result of the query that is physically stored permanently, and has to be refreshed to get any updated data. A materialized view is for good use when it queries a lot of data or is executed very often. 
+
+When reviewing the queries to determine which should be views or not, it is immediate that it all depends very much on how one interprets how each query will be used, and how much it will be used. The results are debatable, and are so because of the way each query requirement is specified, The results are:
+
+\begin{itemize}
+    \item 
+        \textbf{Query 1}
+        The first query is not a view or materialized view since it is expected that it will be used directly, with the user manually entering the specified year in the script.
+    \item
+        \textbf{Query 2}
+        Same as above
+    \item    
+        \textbf{Query 3}
+        Same as above
+    \item
+        \textbf{Query 4}
+        Same as above
+    \item
+        \textbf{Query 5}
+        Chosen to be a view, but not a materialized view. It is not materialized since it will probably only be executed once per day and therefore has no reason to be materialized. 
+    \item
+        \textbf{Query 6}
+        Chosen to be a materialized view. This is because it is set to be used from a website which displays the data, and the traffic to the website is not known, but the decision to make it materialized is to be sure the website only gets the data it needs, and does not have to query multiple tables every time a user hits refresh. The thing to be careful of is that the view has to be refreshed when some data in the original tables involved changes. This can be done by programmatically or with database triggers.
+    \item
+        \textbf{Query 7}
+        This is chosen to be a view, but not a materialized view. It is eligible to be a materialized view, since it is supposed to be queried by a website. However, it would require the view to be refreshed based on multiple requirements and therefore create many dependencies. To avoid this, a simple view is created instead, at the cost and performance risk of having to calculate the result each time the view is referenced. The performance could be bettered by how the website caches the results from the database. 
+\end{itemize}
 
 
 \begin{thebibliography}{3}

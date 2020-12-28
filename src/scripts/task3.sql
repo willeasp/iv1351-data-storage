@@ -9,7 +9,8 @@ guitar, trumpet, etc). The latter list shall be sorted BY number of rentals.
 This query is expected to be performed a few times per week. 
 */
 
-CREATE OR REPLACE VIEW RentalsPerMonth AS 
+
+-- not a view since the year hsa to be specified. 
 SELECT  
     COALESCE("month", 'ALL') AS month, 
     COALESCE("instrument", 'TOTAL') AS instrument,
@@ -61,7 +62,7 @@ The same as above, but retrieve the average number of rentals per month
 during the entire year, instead of the total for each month. 
 */
 
-CREATE OR REPLACE VIEW RentalsMonthlyAverage AS 
+-- not a view since the year hsa to be specified. 
 SELECT 
     COALESCE("instrument", 'ALL') AS instrument,
     CAST(COUNT(*) /12.0 AS DECIMAL(10,2)) AS avg_rentals
@@ -94,7 +95,7 @@ the specific number of individual lessons, group lessons and ensembles. This
 query is expected to be performed a few times per week. 
 */
 
-CREATE OR REPLACE VIEW LessonsPerMonth AS
+-- not a view since the year hsa to be specified. 
 SELECT  
     COALESCE("month", 'ALL') AS month,
     SUM(i) i_lessons, 
@@ -147,7 +148,7 @@ ORDER BY total DESC;
 The same as above, but retrieve the average number of lessons per month
 during the entire year, instead of the total for each month. */
 
-CREATE OR REPLACE VIEW LessonsMonthlyAverage AS 
+-- not a view since the year hsa to be specified. 
 SELECT  EXTRACT(YEAR FROM date) AS year, 
         CAST(SUM(i) /12.0 AS DECIMAL(10,2)) AS i_lessons, 
         CAST(SUM(g) /12.0 AS DECIMAL(10,2)) AS g_lessons, 
@@ -192,6 +193,7 @@ the last month, sorted BY number of given lessons. This query will be used to
 find instructors risking to work too much, and will be executed daily. */
 
 CREATE OR REPLACE VIEW InstructorOverworkingStatus AS
+-- not materialized since it will probably only be executed once per day and has to be updated then. 
 -- Get the 3 instructors with the most amount of lessons
 (SELECT
     instructor_id AS instructor,
@@ -269,7 +271,9 @@ displayed on Soundgood's web page. You only have to create the queries, not the 
 List all ensembles held during the next week, sorted by music genre and weekday. For each 
 ensemble tell whether it's full booked, has 1-2 seats left or has more seats left.*/
 
-CREATE OR REPLACE VIEW EnsemblesNextWeek AS 
+
+CREATE OR REPLACE MATERIALIZED VIEW EnsemblesNextWeek AS 
+-- not materialized since it has to be updated, but is eligible to be materialized. 
 SELECT 
     genre, 
     TO_CHAR(date, 'Day') AS weekday,
@@ -317,6 +321,7 @@ ORDER BY
 List the three instruments with the lowest monthly rental fee. For each instrument tell 
 whether it is rented or available to rent. Also tell when the next group lesson for each
 listed instrument is scheduled. */
+
 
 CREATE OR REPLACE VIEW AvailableInstruments AS
 SELECT 
