@@ -152,7 +152,8 @@ CREATE TABLE rental (
  start_date DATE,
  end_date DATE,
  student_id INT NOT NULL REFERENCES student (student_id) ON DELETE NO ACTION,
- ri_id INT NOT NULL REFERENCES rental_instrument (ri_id) ON DELETE NO ACTION
+ ri_id INT NOT NULL REFERENCES rental_instrument (ri_id) ON DELETE NO ACTION,
+ terminated DATE
 );
 
 

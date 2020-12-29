@@ -197,7 +197,8 @@ CREATE OR REPLACE VIEW InstructorOverworkingStatus AS
 -- Get the 3 instructors with the most amount of lessons
 (SELECT
     instructor_id AS instructor,
-    COUNT(instructor_id) AS given_lessons
+    COUNT(instructor_id) AS given_lessons,
+    'last_month' AS month
 FROM (
     SELECT 
         date, 
@@ -218,7 +219,8 @@ FROM (
         ensemble
 ) AS lessons
 WHERE
-    date >= DATE_TRUNC('month', CURRENT_DATE)
+    date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1' month) AND 
+    date < DATE_TRUNC('month', CURRENT_DATE)
 GROUP BY 
     instructor
 ORDER BY 
@@ -229,7 +231,8 @@ UNION
 -- Get the isntructors that have done at least 2 lessons
 SELECT 
     instructor_id AS instructor,
-    COUNT(instructor_id) AS given_lessons
+    COUNT(instructor_id) AS given_lessons,
+    'current_month' AS month
 FROM (
     SELECT 
         date, 
@@ -256,6 +259,7 @@ GROUP BY
 HAVING
     COUNT(instructor_id) >= 2
 ORDER BY given_lessons DESC;
+
 
 
 /* ************************************************************************************ */

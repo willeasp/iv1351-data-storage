@@ -1,0 +1,26 @@
+
+functionality:
+  list instruments: list instruments of a certain kind that is available to rent,
+                    instruments already rented shall not be included in the listing.
+                    Show brand and price for each instrument. 
+  
+  rent instrument:  a student shall be able to specify an exact instrument to rent,
+                    and students can not rent more than two instruments at the same time
+
+  terminate rental: students shall be able to terminate an ongoing rental. it is not 
+                    allowed to delete all information about a terminated rental. 
+
+important:
+  - transactions handling
+  - terminate rental shall show that it has been terminated
+  - naming conventions
+  - transaction management, commit and rollback used correctly
+  - program working as expected
+
+higher grade:
+  - Easily understandeable code *comments*
+  - MVC and layer patterns used correctly:
+    - the controller shall not handle any logic
+    - the model shall not contain any code related to the view
+    - no duplicated code
+

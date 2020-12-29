@@ -12,6 +12,7 @@ try:
     )
 
     print(connection)
+    print(type(connection))
 
     cursor = connection.cursor()
     # Print PostgreSQL details
