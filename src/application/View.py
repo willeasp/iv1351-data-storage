@@ -4,18 +4,23 @@
 from Controller import Controller
 from datetime import date
 import curses
+import sys
+
+
 
 
 class View(object):
     menu = ['Get available rental instruments', 'Make a rental', 'Get students rentals', 'Terminate a rental', 'Exit']
     menu_top_line = ['--------------', '--------------', '--------------', '--------------',]
 
-
+    
 
     def __init__(self, ctrl:Controller):
         self.ctrl = ctrl
         print("Hello view!!")
         curses.wrapper(self.main)
+    
+    
 
 
     def print_menu(self, stdscr, selected_row_idx):
@@ -38,6 +43,8 @@ class View(object):
 
         stdscr.clear()
         h, w = stdscr.getmaxyx()
+
+        stdscr.addstr(0,0, str(res))
 
         # insert header
         if col_names:
@@ -95,7 +102,7 @@ class View(object):
 
         # print the menu
         # self.print_menu(stdscr, current_row)
-        self.print_result(stdscr, self.menu, current_row)
+        self.print_result(stdscr, active_menu, current_row)
 
 
         # main loop
@@ -111,21 +118,20 @@ class View(object):
 
             elif key == curses.KEY_ENTER or key in [10, 13]:
 
-                if current_row == self.menu.index("Get available rental instruments"):
+                """ if current_row == self.menu.index("Get available rental instruments"):
                     res, col = self.get_available_rental_instruments()
                     active_menu = [res, col]
                     current_row = 0
-        
+         """
                 # if user selected last row, exit the program
-                elif current_row == self.menu.index("Exit"):
+                if current_row == self.menu.index("Exit"):
                     break
                 
                 stdscr.getch()
                 active_menu = self.menu
-            # print menu
-            self.print_result(stdscr, *active_menu, current_row)
 
-
+            prints(stdscr, active_menu)
+            self.print_result(stdscr, active_menu, current_row)
 
 
 
@@ -145,6 +151,18 @@ class View(object):
         self.ctrl.terminate_rental(rental_id)
 
 
+def prints(stdscr, shit):
+    stdscr.addstr(str(shit))
+    stdscr.refresh()
+
+""" to print to console """
+class StdOutWrapper:
+    text = ""
+    def write(self,txt):
+        self.text += txt
+        self.text = '\n'.join(self.text.split('\n')[-30:])
+    def get_text(self):
+        return '\n'.join(self.text.split('\n'))
 
 if __name__ == "__main__":
     from DatabaseHandler import DatabaseHandler
@@ -152,11 +170,11 @@ if __name__ == "__main__":
     db = DatabaseHandler()
     model = Model(db)
     ctrl = Controller(model)
-
-    # res, col = ctrl.get_available_rental_instruments()
-    # print(res)
-    # print(col)
-
+    
     view = View(ctrl)
 
-    print(sout)
+
+
+
+
+
