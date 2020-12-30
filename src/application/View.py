@@ -38,30 +38,25 @@ class View(object):
         stdscr.refresh()
 
 
-    def print_result(self, stdscr, result:list, col_names=None, selected_row_idx=None):
+    def print_result(self, stdscr, result:list, col_names=None, selected_row_idx=-100000, messages:list=None):
         res = result.copy()
-
         stdscr.clear()
         h, w = stdscr.getmaxyx()
-
-        stdscr.addstr(0,0, str(res))
+        stdscr.addstr(0,0, str("Nu kör vi killen!"))
 
         # insert header
-        if col_names:
-            res.insert(0, self.menu_top_line)
-            res.insert(0, col_names)
+        res.insert(0, self.menu_top_line)
+        res.insert(0, col_names)
+
+        if messages:
+            i = len(messages)
+            for message in messages:
+                self.print_center(stdscr, message, (h//2 - len(res)// 2) -i -2)
 
         # print lines
+        width = 0
         for idx, row in enumerate(res):
-            string = ""
-
-            # check for nested rows
-            if isinstance(row, list):
-                for col in row:
-                    col = str(col).capitalize()
-                    string += f"| {col:<15}"
-            else:
-                string = row
+            string = self.row_to_string(row)
 
             # get width of first item
             if idx == 0:
@@ -70,7 +65,7 @@ class View(object):
             y = h//2  - len(res)  // 2 + idx
 
             # mark the selected row
-            if idx == selected_row_idx:
+            if idx == selected_row_idx +2:
                 stdscr.attron(curses.color_pair(1))
                 stdscr.addstr(y, x, str(string))
                 stdscr.attroff(curses.color_pair(1))
@@ -78,15 +73,25 @@ class View(object):
                 stdscr.addstr(y, x, str(string))
             # print
             stdscr.refresh()
+            
 
+    @staticmethod
+    def row_to_string(row) -> str:
+        string = ""
+        for col in row:
+            col = str(col).capitalize()
+            string += f"| {col:<15}"
+        return string
 
-    def print_center(self, stdscr, text):
-        stdscr.clear()
+    @staticmethod
+    def print_center(stdscr, text, y=None):
+        # stdscr.clear()
         h, w = stdscr.getmaxyx()
         x = w//2 - len(text)//2
-        y = h//2
+        if not y:
+            y = h//2
         stdscr.addstr(y, x, text)
-        stdscr.refresh()
+        # stdscr.refresh()
 
 
     def main(self, stdscr):
@@ -96,45 +101,73 @@ class View(object):
         # color scheme for selected row
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
-        # specify the current selected row
+        self.main_menu(stdscr)
+
+
+    def main_menu(self, stdscr):
         current_row = 0
-        active_menu = self.menu
-
-        # print the menu
-        # self.print_menu(stdscr, current_row)
-        self.print_result(stdscr, active_menu, current_row)
-
-
-        # main loop
+        self.print_menu(stdscr, current_row)
         while 1:
             key = stdscr.getch()
-
             if key == curses.KEY_UP and current_row > 0:
                 current_row -= 1
-
-        # TODO the menu selector is offset
-            elif key == curses.KEY_DOWN and current_row < len(active_menu)-1:
+            elif key == curses.KEY_DOWN and current_row < len(self.menu)-1:
                 current_row += 1
-
             elif key == curses.KEY_ENTER or key in [10, 13]:
-
                 if current_row == self.menu.index("Get available rental instruments"):
                     res, col = self.get_available_rental_instruments()
-                    active_menu = [res, col]
-                    current_row = 0
-                    self.print_result(stdscr, res, col, current_row)
-        
-                # if user selected last row, exit the program
+                    self.print_result(stdscr, result=res, col_names=col)
+                    stdscr.getch()
+                if current_row == self.menu.index("Make a rental"):
+                    self.rental_menu(stdscr)
                 if current_row == self.menu.index("Exit"):
                     break
-                
-                stdscr.getch()
+            self.print_menu(stdscr, selected_row_idx=current_row)
 
-            self.print_menu(stdscr, current_row)
+    def rental_menu(self, stdscr):
+        current_row = 0
+        res, col = self.get_available_rental_instruments()
+        message = ["Choose the instrument you want to rent."]
+        self.print_result(stdscr, result=res, col_names=col, selected_row_idx=current_row, messages=message)
+        while 1:
+            key = stdscr.getch()
+            if key == curses.KEY_UP and current_row > 0:
+                current_row -= 1
+            elif key == curses.KEY_DOWN and current_row < len(res)-1:
+                current_row += 1
+            elif key == curses.KEY_ENTER or key in [10, 13]:
+                self.make_rental(stdscr, res[current_row], col)
+            elif key == ord('b'):
+                return
+            self.print_result(stdscr, result=res, col_names=col, selected_row_idx=current_row, messages=message)
 
 
-
-
+    def make_rental(self, stdscr, instrument, col_names):
+        instrument = [instrument]
+        message = ["Do you want to rent this instrument? Press y or n (yes or no)"]
+        self.print_result(stdscr, result=instrument, col_names=col_names, messages=message)
+        key = stdscr.getch()
+        if key == ord('y'):
+            student_id = self.get_student(stdscr)
+            self.create_rental()
+            
+    def get_student(self, stdscr) -> int:
+        stdscr.clear()
+        id = 1
+        self.print_center(stdscr, "Enter your student id", 15)
+        self.print_center(stdscr, str(id), 16)
+        while 1:
+            key = stdscr.getch()
+            if key == curses.KEY_UP and id > 1:
+                id -= 1
+            elif key == curses.KEY_DOWN and id < 100:
+                id += 1
+            elif key == curses.KEY_ENTER or key in [10, 13]:
+                return id
+            stdscr.clear()
+            self.print_center(stdscr, "Enter your student id", 15)
+            self.print_center(stdscr, str(id), 16)
+            stdscr.refresh()
 
 
     def get_available_rental_instruments(self) -> list:
@@ -151,8 +184,9 @@ class View(object):
 
 
 def prints(stdscr, shit):
-    stdscr.addstr(str(shit))
+    stdscr.addstr(20,0,shit)
     stdscr.refresh()
+    stdscr.getch()
 
 """ to print to console """
 class StdOutWrapper:
