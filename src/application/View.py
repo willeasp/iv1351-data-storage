@@ -118,20 +118,19 @@ class View(object):
 
             elif key == curses.KEY_ENTER or key in [10, 13]:
 
-                """ if current_row == self.menu.index("Get available rental instruments"):
+                if current_row == self.menu.index("Get available rental instruments"):
                     res, col = self.get_available_rental_instruments()
                     active_menu = [res, col]
                     current_row = 0
-         """
+                    self.print_result(stdscr, res, col, current_row)
+        
                 # if user selected last row, exit the program
                 if current_row == self.menu.index("Exit"):
                     break
                 
                 stdscr.getch()
-                active_menu = self.menu
 
-            prints(stdscr, active_menu)
-            self.print_result(stdscr, active_menu, current_row)
+            self.print_menu(stdscr, current_row)
 
 
 
