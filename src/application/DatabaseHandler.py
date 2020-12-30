@@ -19,11 +19,12 @@ class DatabaseHandler(object):
     def get_available_rental_instruments(self) -> list:
         """ Get all rental instruments that can be rented """
         self.cursor.execute("""
-            SELECT name, brand, monthly_cost, ri_id AS id
+            SELECT DISTINCT name, brand, monthly_cost, ri_id AS id
             FROM rental_instrument AS ri
             NATURAL LEFT OUTER JOIN rental AS r
             WHERE CURRENT_DATE NOT BETWEEN r.start_date AND r.end_date
-                OR r.student_id IS NULL;
+                OR r.student_id IS NULL
+            ORDER BY monthly_cost;
         """)
         return self._cursor_result()
 
@@ -38,7 +39,6 @@ class DatabaseHandler(object):
                 INSERT INTO rental (start_date, end_date, student_id, ri_id)
                 VALUES  (%s, %s::date + INTERVAL '%s month', %s , %s)
             """, [start_date, start_date, months_to_rent, student_id, rental_instrument])
-            print("com")
             self.db.commit()
         except:
             self.db.rollback()
@@ -53,6 +53,7 @@ class DatabaseHandler(object):
                 r.student_id = %s;
          """, [student_id])
         # return self.cursor.fetchall()
+        print(self.cursor.description)
         return self._cursor_result()
 
 
@@ -94,7 +95,7 @@ class DatabaseHandler(object):
 
     def _cursor_result(self) -> list:
         # return self.to_json(self.cursor.fetchall())
-        return self.cursor.fetchall()
+        return self.cursor.fetchall(), [desc[0] for desc in self.cursor.description]
 
 
     def to_json(self, o:object) -> str:
@@ -124,7 +125,10 @@ class DatabaseHandler(object):
 if __name__ == "__main__":
     db = DatabaseHandler()
     print(db.get_available_rental_instruments())
+
     db.create_rental(1, 2, date(2020, 1, 2), 12)
+
     print("student 3 rentals:")
     print(db.student_rentals(3))
+
     db.terminate_rental(9)

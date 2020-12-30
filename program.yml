@@ -24,3 +24,9 @@ higher grade:
     - the model shall not contain any code related to the view
     - no duplicated code
 
+
+view:
+  - vad behöver jag?
+  - print funktion:
+    tar emot en lista. men måste också kunna printa olika saker eller funktioner, eller?
+    ska jag ha flera olika loops? fan

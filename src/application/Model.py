@@ -1,5 +1,13 @@
 #! /usr/local/bin/python3
 
+""" 
+Author: William Asp
+30 December, 2020
+
+This class is responsible for the soundgood music school's business rules.
+
+"""
+
 from DatabaseHandler import DatabaseHandler
 from datetime import date
 
@@ -30,20 +38,38 @@ class Model(object):
     
     def terminate_rental(self, rental_id:int):
         """ Terminate a rental """
-        terminated = self.dbhandler.get_rental(rental_id)[-1]
+        terminated = self.dbhandler.get_rental(rental_id)[-1]   # the terminated column is last in the table
         if terminated:
-            if terminated < date.today:
+            if terminated < date.today():
                 raise Exception("Rental already terminated")
 
         
 
-
-if __name__ == "__main__":
+def _model_test():
     db = DatabaseHandler()
     model = Model(db)
-    # print(model.get_available_rental_instruments())
-    # try:
-    #     model.create_rental(4, 2, date.today(), 12)
-    # except:
-    #     print("did not create rental")
-    model.terminate_rental(28)
+
+    # test 1
+    assert model.get_available_rental_instruments()
+
+    # test 2
+    try:
+        model.terminate_rental(9)
+        assert False
+    except:
+        assert True
+
+    # test 3
+    try:
+        model.create_rental(4, 2, date.today(), 12)
+        assert False
+    except:
+        assert True
+
+    # test 4
+    assert model.student_rentals(1)
+
+
+
+if __name__ == "__main__":
+    _model_test()
