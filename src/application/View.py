@@ -11,7 +11,7 @@ import sys
 
 class View(object):
     menu = ['List instruments', 'Rent instrument', 'Get students rentals', 'Terminate rental', 'Exit']
-    menu_top_line = ['--------------', '--------------', '--------------', '--------------',]
+    menu_top_line = '--------------'
 
     
 
@@ -45,8 +45,11 @@ class View(object):
         stdscr.addstr(0,0, str("Nu kör vi killen!"))
 
         # insert header
-        res.insert(0, self.menu_top_line)
-        res.insert(0, col_names)
+        top_line = []
+        for x in range(len(col_names)):
+            top_line.append(self.menu_top_line)
+        res.insert(0, self.row_to_string(top_line))
+        res.insert(0, self.row_to_string(col_names))
 
         if messages:
             i = len(messages)
@@ -55,22 +58,22 @@ class View(object):
 
         # print lines
         width = 0
-        for idx, row in enumerate(res):
-            string = self.row_to_string(row)
 
+
+        for idx, row in enumerate(res):
             # get width of first item
             if idx == 0:
-                width = len(string) 
+                width = len(row) 
             x = w//2 - width//2
             y = h//2  - len(res)  // 2 + idx
 
             # mark the selected row
             if idx == selected_row_idx +2:
                 stdscr.attron(curses.color_pair(1))
-                stdscr.addstr(y, x, str(string))
+                stdscr.addstr(y, x, row)
                 stdscr.attroff(curses.color_pair(1))
             else:
-                stdscr.addstr(y, x, str(string))
+                stdscr.addstr(y, x, row)
             # print
             stdscr.refresh()
             
@@ -116,19 +119,31 @@ class View(object):
             elif key == curses.KEY_ENTER or key in [10, 13]:
                 if current_row == self.menu.index("List instruments"):
                     res, col = self.get_available_rental_instruments()
+                    res = [self.row_to_string(row) for row in res]
                     self.print_result(stdscr, result=res, col_names=col)
                     stdscr.getch()
-                if current_row == self.menu.index("Rent instrument"):
+                elif current_row == self.menu.index("Rent instrument"):
                     self.rental_menu(stdscr)
-                if current_row == self.menu.index("Exit"):
+                elif current_row == self.menu.index("Get students rentals"):
+                    student_id = self.get_number(stdscr, "Enter your student id", 100)
+                    res, col = self.student_rentals(student_id)
+                    res = [self.row_to_string(row) for row in res]
+                    messages = [f"Student {student_id} rentals"]
+                    self.print_result(stdscr, result=res, col_names=col, messages=messages)
+                    stdscr.getch()
+                elif current_row == self.menu.index("Terminate rental"):
+                    self.terminate_rental_menu(stdscr)
+                elif current_row == self.menu.index("Exit"):
                     break
             self.print_menu(stdscr, selected_row_idx=current_row)
+
 
     def rental_menu(self, stdscr):
         current_row = 0
         res, col = self.get_available_rental_instruments()
         message = ["Choose the instrument you want to rent."]
-        self.print_result(stdscr, result=res, col_names=col, selected_row_idx=current_row, messages=message)
+        res_string = [self.row_to_string(row) for row in res]
+        self.print_result(stdscr, result=res_string, col_names=col, selected_row_idx=current_row, messages=message)
         while 1:
             key = stdscr.getch()
             if key == curses.KEY_UP and current_row > 0:
@@ -139,12 +154,54 @@ class View(object):
                 self.make_rental(stdscr, res[current_row], col)
             elif key == ord('b'):
                 return
-            self.print_result(stdscr, result=res, col_names=col, selected_row_idx=current_row, messages=message)
+            self.print_result(stdscr, result=res_string, col_names=col, selected_row_idx=current_row, messages=message)
+
+    def terminate_rental_menu(self, stdscr):
+        current_row = 0
+        student_id = self.get_student(stdscr)
+        res, col = self.student_rentals(student_id)
+        if len(res) > 0:
+            message = [f"Choose the rental you want to terminate."]
+            res_string = [self.row_to_string(row) for row in res]
+            self.print_result(stdscr, result=res_string, col_names=col, selected_row_idx=current_row, messages=message)
+            while 1:
+                key = stdscr.getch()
+                if key == curses.KEY_UP and current_row > 0:
+                    current_row -= 1
+                elif key == curses.KEY_DOWN and current_row < len(res)-1:
+                    current_row += 1
+                elif key == curses.KEY_ENTER or key in [10, 13]:
+                    try:
+                        self.terminate_rental(res[current_row][-1])
+                        stdscr.clear()
+                        self.print_center(stdscr, f"Congratulations, you terminated your rental.", 15)
+                        self.print_center(stdscr, f"Press any key to continue.", 16)
+                        stdscr.refresh()
+                        stdscr.getch()
+                        return
+                    except FileNotFoundError as e:
+                        stdscr.clear()
+                        self.print_center(stdscr, f"Could not terminate rental.", 15)
+                        self.print_center(stdscr, f"Error: {e}.", 16)
+                        stdscr.refresh()
+                        stdscr.getch()
+                elif key == ord('b'):
+                    return
+                self.print_result(stdscr, result=res_string, col_names=col, selected_row_idx=current_row, messages=message)
+        else:
+            stdscr.clear()
+            self.print_center(stdscr, f"You do not have any rentals to terminate.", 15)
+            self.print_center(stdscr, f"Press any key to go back.", 16)
+            stdscr.refresh()
+            stdscr.getch()
+            return
+
 
 
     def make_rental(self, stdscr, instrument, col_names):
         message = ["Do you want to rent this instrument? Press y (yes) or any button"]
-        self.print_result(stdscr, result=[instrument], col_names=col_names, messages=message)
+        instrument_string = self.row_to_string(instrument)
+        self.print_result(stdscr, result=instrument_string, col_names=col_names, messages=message)
         key = stdscr.getch()
         if key == ord('y'):
             try:
@@ -173,8 +230,9 @@ class View(object):
                 self.print_center(stdscr, f"Something went wrong renting the instrument {instrument}", 15)
                 self.print_center(stdscr, f"Error: {e}", 16)
                 stdscr.refresh()
-                key = stdscr.getch()
+                stdscr.getch()
             
+
     def get_student(self, stdscr) -> int:
         stdscr.clear()
         id = 1
@@ -192,6 +250,7 @@ class View(object):
             self.print_center(stdscr, "Enter your student id", 15)
             self.print_center(stdscr, str(id), 16)
             stdscr.refresh()
+
 
     def get_number(self, stdscr, message, max) -> int:
         stdscr.clear()
@@ -228,15 +287,6 @@ def prints(stdscr, shit):
     stdscr.addstr(20,0,shit)
     stdscr.refresh()
     stdscr.getch()
-
-""" to print to console """
-class StdOutWrapper:
-    text = ""
-    def write(self,txt):
-        self.text += txt
-        self.text = '\n'.join(self.text.split('\n')[-30:])
-    def get_text(self):
-        return '\n'.join(self.text.split('\n'))
 
 if __name__ == "__main__":
     from DatabaseHandler import DatabaseHandler

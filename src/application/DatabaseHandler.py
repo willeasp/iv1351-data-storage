@@ -49,10 +49,16 @@ class DatabaseHandler(object):
     def student_rentals(self, student_id:int) -> list:
         """ Get a students currently active rentals """
         self.cursor.execute(""" 
-            SELECT *
-            FROM rental AS r
-            WHERE CURRENT_DATE BETWEEN r.start_date AND r.end_date AND
-                r.student_id = %s;
+            SELECT name, brand, monthly_cost, start_date, end_date, ri_id AS id
+            FROM rental
+            NATURAL JOIN rental_instrument
+            WHERE CURRENT_DATE < end_date 
+                AND
+                student_id = %s
+                AND
+                (CURRENT_DATE < terminated
+                OR
+                terminated IS NULL);
          """, [student_id])
         # return self.cursor.fetchall()
         return self._cursor_result()
@@ -76,7 +82,7 @@ class DatabaseHandler(object):
             FROM rental
             WHERE rental_id = %s        
         """, [rental_id])
-        [res] = self._cursor_result()
+        [res], col = self._cursor_result()
         return res
 
 

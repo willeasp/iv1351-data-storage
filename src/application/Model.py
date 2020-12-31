@@ -38,10 +38,11 @@ class Model(object):
     
     def terminate_rental(self, rental_id:int):
         """ Terminate a rental """
-        terminated = self.dbhandler.get_rental(rental_id)[-1]   # the terminated column is last in the table
+        rental = self.dbhandler.get_rental(rental_id)
+        terminated = rental[-1]   # the terminated column is last in the table
         if terminated:
             if terminated < date.today():
-                raise Exception("Rental already terminated")
+                raise FileNotFoundError("Rental already terminated")
 
         
 
