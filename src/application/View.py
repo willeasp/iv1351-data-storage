@@ -10,7 +10,7 @@ import sys
 
 
 class View(object):
-    menu = ['Get available rental instruments', 'Make a rental', 'Get students rentals', 'Terminate a rental', 'Exit']
+    menu = ['List instruments', 'Rent instrument', 'Get students rentals', 'Terminate rental', 'Exit']
     menu_top_line = ['--------------', '--------------', '--------------', '--------------',]
 
     
@@ -114,11 +114,11 @@ class View(object):
             elif key == curses.KEY_DOWN and current_row < len(self.menu)-1:
                 current_row += 1
             elif key == curses.KEY_ENTER or key in [10, 13]:
-                if current_row == self.menu.index("Get available rental instruments"):
+                if current_row == self.menu.index("List instruments"):
                     res, col = self.get_available_rental_instruments()
                     self.print_result(stdscr, result=res, col_names=col)
                     stdscr.getch()
-                if current_row == self.menu.index("Make a rental"):
+                if current_row == self.menu.index("Rent instrument"):
                     self.rental_menu(stdscr)
                 if current_row == self.menu.index("Exit"):
                     break
@@ -143,13 +143,37 @@ class View(object):
 
 
     def make_rental(self, stdscr, instrument, col_names):
-        instrument = [instrument]
-        message = ["Do you want to rent this instrument? Press y or n (yes or no)"]
-        self.print_result(stdscr, result=instrument, col_names=col_names, messages=message)
+        message = ["Do you want to rent this instrument? Press y (yes) or any button"]
+        self.print_result(stdscr, result=[instrument], col_names=col_names, messages=message)
         key = stdscr.getch()
         if key == ord('y'):
-            student_id = self.get_student(stdscr)
-            self.create_rental()
+            try:
+                student_id = self.get_number(stdscr, "Enter your student id", 100)
+                months_to_rent = self.get_number(stdscr, "How many months do you want to rent?", 12)
+            except:
+                return
+            try:
+                self.create_rental(student_id=student_id, rental_instrument=instrument[-1], start_date=date.today(), months_to_rent=months_to_rent)
+                stdscr.clear()
+                self.print_center(stdscr, f"Congratulations, you just rented instrument {instrument[-1]}", 15)
+                stdscr.refresh()
+                key = stdscr.getch()
+            except PermissionError as e:
+                stdscr.clear()
+                self.print_center(stdscr, f"Sorry, student {student_id} can not rent more instruments.", 15)
+                self.print_center(stdscr, "The maximum number of rentals is 2.", 16)
+                self.print_center(stdscr, "Press ENTER to continue", 17)
+                self.print_center(stdscr, f"Error: {e}", 19)
+                stdscr.refresh()
+                key = stdscr.getch()
+                if key == curses.KEY_ENTER:
+                    return
+            except RuntimeError as e:
+                stdscr.clear()
+                self.print_center(stdscr, f"Something went wrong renting the instrument {instrument}", 15)
+                self.print_center(stdscr, f"Error: {e}", 16)
+                stdscr.refresh()
+                key = stdscr.getch()
             
     def get_student(self, stdscr) -> int:
         stdscr.clear()
@@ -169,6 +193,23 @@ class View(object):
             self.print_center(stdscr, str(id), 16)
             stdscr.refresh()
 
+    def get_number(self, stdscr, message, max) -> int:
+        stdscr.clear()
+        num = 1
+        self.print_center(stdscr, message, 15)
+        self.print_center(stdscr, str(num), 16)
+        while 1:
+            key = stdscr.getch()
+            if key == curses.KEY_UP and num > 1:
+                num -= 1
+            elif key == curses.KEY_DOWN and num < max:
+                num += 1
+            elif key == curses.KEY_ENTER or key in [10, 13]:
+                return num
+            stdscr.clear()
+            self.print_center(stdscr, message, 15)
+            self.print_center(stdscr, str(num), 16)
+            stdscr.refresh()
 
     def get_available_rental_instruments(self) -> list:
         return self.ctrl.get_available_rental_instruments()

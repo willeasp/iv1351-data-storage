@@ -25,9 +25,9 @@ class Model(object):
     
     def create_rental(self, student_id:int, rental_instrument:int, start_date:date, months_to_rent:int):
         """ Create a rental if no more than 2 instruments have been rented """
-        active_rentals = self.student_rentals(student_id)
+        active_rentals = self.student_rentals(student_id)[0]
         if len(active_rentals) > 1:
-            raise Exception("Student can not rent more instruments.")
+            raise PermissionError(f"Student can not rent more instruments. Rented: {len(active_rentals)}")
         self.dbhandler.create_rental(student_id, rental_instrument, start_date, months_to_rent)
 
     
@@ -67,7 +67,9 @@ def _model_test():
         assert True
 
     # test 4
-    assert model.student_rentals(1)
+    a, b = model.student_rentals(1)
+    print(len(a))
+    print(b)
 
 
 

@@ -20,10 +20,11 @@ class DatabaseHandler(object):
         """ Get all rental instruments that can be rented """
         self.cursor.execute("""
             SELECT DISTINCT name, brand, monthly_cost, ri_id AS id
-            FROM rental_instrument AS ri
-            NATURAL LEFT OUTER JOIN rental AS r
-            WHERE CURRENT_DATE NOT BETWEEN r.start_date AND r.end_date
-                OR r.student_id IS NULL
+            FROM rental_instrument 
+            NATURAL LEFT OUTER JOIN rental 
+            WHERE CURRENT_DATE > end_date
+                OR start_date IS NULL
+                OR CURRENT_DATE >= terminated
             ORDER BY monthly_cost;
         """)
         return self._cursor_result()
@@ -42,6 +43,7 @@ class DatabaseHandler(object):
             self.db.commit()
         except:
             self.db.rollback()
+            raise RuntimeError("Could not rent instrument.")
 
 
     def student_rentals(self, student_id:int) -> list:
@@ -53,7 +55,6 @@ class DatabaseHandler(object):
                 r.student_id = %s;
          """, [student_id])
         # return self.cursor.fetchall()
-        print(self.cursor.description)
         return self._cursor_result()
 
 
