@@ -20,12 +20,12 @@ class DatabaseHandler(object):
         """ Get all rental instruments that can be rented """
         self.cursor.execute("""
             SELECT DISTINCT name, brand, monthly_cost, ri_id AS id
-            FROM rental_instrument 
-            NATURAL LEFT OUTER JOIN rental 
-            WHERE CURRENT_DATE > end_date
-                OR start_date IS NULL
-                OR CURRENT_DATE >= terminated
-            ORDER BY monthly_cost;
+            FROM rental_instrument AS ri
+            WHERE NOT EXISTS
+            (SELECT 1 FROM rental AS r
+            WHERE ri.ri_id = r.ri_id 
+                AND CURRENT_DATE < end_date
+                AND terminated IS NULL)
         """)
         return self._cursor_result()
 

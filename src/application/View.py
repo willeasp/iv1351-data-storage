@@ -42,7 +42,6 @@ class View(object):
         res = result.copy()
         stdscr.clear()
         h, w = stdscr.getmaxyx()
-        stdscr.addstr(0,0, str("Nu kör vi killen!"))
 
         # insert header
         top_line = []
@@ -125,12 +124,15 @@ class View(object):
                 elif current_row == self.menu.index("Rent instrument"):
                     self.rental_menu(stdscr)
                 elif current_row == self.menu.index("Get students rentals"):
-                    student_id = self.get_number(stdscr, "Enter your student id", 100)
-                    res, col = self.student_rentals(student_id)
-                    res = [self.row_to_string(row) for row in res]
-                    messages = [f"Student {student_id} rentals"]
-                    self.print_result(stdscr, result=res, col_names=col, messages=messages)
-                    stdscr.getch()
+                    while 1:
+                        student_id = self.get_number(stdscr, "Enter your student id", 100)
+                        res, col = self.student_rentals(student_id)
+                        res = [self.row_to_string(row) for row in res]
+                        messages = [f"Student {student_id} rentals", "Press b for main menu"]
+                        self.print_result(stdscr, result=res, col_names=col, messages=messages)
+                        key = stdscr.getch()
+                        if key == ord('b'):
+                            break
                 elif current_row == self.menu.index("Terminate rental"):
                     self.terminate_rental_menu(stdscr)
                 elif current_row == self.menu.index("Exit"):
@@ -152,6 +154,7 @@ class View(object):
                 current_row += 1
             elif key == curses.KEY_ENTER or key in [10, 13]:
                 self.make_rental(stdscr, res[current_row], col)
+                return
             elif key == ord('b'):
                 return
             self.print_result(stdscr, result=res_string, col_names=col, selected_row_idx=current_row, messages=message)
@@ -201,7 +204,7 @@ class View(object):
     def make_rental(self, stdscr, instrument, col_names):
         message = ["Do you want to rent this instrument? Press y (yes) or any button"]
         instrument_string = self.row_to_string(instrument)
-        self.print_result(stdscr, result=instrument_string, col_names=col_names, messages=message)
+        self.print_result(stdscr, result=[instrument_string], col_names=col_names, messages=message)
         key = stdscr.getch()
         if key == ord('y'):
             try:
@@ -215,6 +218,7 @@ class View(object):
                 self.print_center(stdscr, f"Congratulations, you just rented instrument {instrument[-1]}", 15)
                 stdscr.refresh()
                 key = stdscr.getch()
+                return
             except PermissionError as e:
                 stdscr.clear()
                 self.print_center(stdscr, f"Sorry, student {student_id} can not rent more instruments.", 15)
