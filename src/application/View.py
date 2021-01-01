@@ -51,14 +51,13 @@ class View(object):
         res.insert(0, self.row_to_string(col_names))
 
         if messages:
+            # prints(stdscr, str(messages))
             i = len(messages)
-            for message in messages:
+            for i, message in enumerate(messages):
                 self.print_center(stdscr, message, (h//2 - len(res)// 2) -i -2)
 
         # print lines
         width = 0
-
-
         for idx, row in enumerate(res):
             # get width of first item
             if idx == 0:
@@ -175,6 +174,7 @@ class View(object):
                     current_row += 1
                 elif key == curses.KEY_ENTER or key in [10, 13]:
                     try:
+                        prints(stdscr, str(res[current_row][-1]))
                         self.terminate_rental(res[current_row][-1])
                         stdscr.clear()
                         self.print_center(stdscr, f"Congratulations, you terminated your rental.", 15)
@@ -185,6 +185,12 @@ class View(object):
                     except FileNotFoundError as e:
                         stdscr.clear()
                         self.print_center(stdscr, f"Could not terminate rental.", 15)
+                        self.print_center(stdscr, f"Error: {e}.", 16)
+                        stdscr.refresh()
+                        stdscr.getch()
+                    except Exception as e:
+                        stdscr.clear()
+                        self.print_center(stdscr, f"Could not exterminate rental.", 15)
                         self.print_center(stdscr, f"Error: {e}.", 16)
                         stdscr.refresh()
                         stdscr.getch()

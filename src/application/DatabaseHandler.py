@@ -49,7 +49,7 @@ class DatabaseHandler(object):
     def student_rentals(self, student_id:int) -> list:
         """ Get a students currently active rentals """
         self.cursor.execute(""" 
-            SELECT name, brand, monthly_cost, start_date, end_date, ri_id AS id
+            SELECT name, brand, monthly_cost, start_date, end_date, ri_id AS id, rental_id
             FROM rental
             NATURAL JOIN rental_instrument
             WHERE CURRENT_DATE < end_date 
@@ -73,8 +73,9 @@ class DatabaseHandler(object):
                 WHERE rental_id = %s
             """, [rental_id])
             self.db.commit()
-        except:
+        except Exception as e:
             self.db.rollback()
+            raise Exception(e)
 
     def get_rental(self, rental_id:int) -> list:
         self.cursor.execute(""" 
