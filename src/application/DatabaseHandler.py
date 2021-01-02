@@ -1,5 +1,12 @@
 #! /usr/local/bin/python3
 
+""" 
+Author: William Asp
+January 2, 2021
+
+This file handles the database calls. 
+ """
+
 import psycopg2
 import json
 from datetime import date

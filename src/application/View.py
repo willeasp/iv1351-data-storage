@@ -1,11 +1,19 @@
 #! /usr/local/bin/python3
 
+""" 
+Author: William Asp
+January 2, 2021
+
+This file is the view of the soundgood music school system. 
+It uses the curses module to create interactive menus inside the terminal
+window.
+
+
+ """
 
 from Controller import Controller
 from datetime import date
 import curses
-import sys
-
 
 
 
@@ -14,8 +22,11 @@ class View(object):
     menu_top_line = '--------------'
 
     
-
     def __init__(self, ctrl:Controller):
+        """ Constructor
+        Args:
+            ctrl (Controller): The controller class that the view will call.
+         """
         self.ctrl = ctrl
         print("Hello view!!")
         curses.wrapper(self.main)
@@ -24,6 +35,12 @@ class View(object):
 
 
     def print_menu(self, stdscr, selected_row_idx):
+        """Function to print menu
+
+        Args:
+            stdscr (curses window)): the screen currently used
+            selected_row_idx (int): the row number selected
+        """
         stdscr.clear()
         h, w = stdscr.getmaxyx()
         for idx, row in enumerate(self.menu):
@@ -39,6 +56,15 @@ class View(object):
 
 
     def print_result(self, stdscr, result:list, col_names=None, selected_row_idx=-100000, messages:list=None):
+        """ Method to print a result from the database.
+
+        Args:
+            stdscr (curses window)): screen object
+            result (list): the result from the database to print to the screen
+            col_names (list, optional): the names of the columns in the result. Defaults to None.
+            selected_row_idx (int, optional): the selected row. Defaults to -100000.
+            messages (list, optional): the message to be shown above the result. Defaults to None.
+        """
         res = result.copy()
         stdscr.clear()
         h, w = stdscr.getmaxyx()
@@ -96,6 +122,11 @@ class View(object):
 
 
     def main(self, stdscr):
+        """Main function to start and run the view
+
+        Args:
+            stdscr (curses window): screen object
+        """
         # turn off cursor blinking
         curses.curs_set(0)
 
@@ -106,6 +137,11 @@ class View(object):
 
 
     def main_menu(self, stdscr):
+        """Main menu loop
+
+        Args:
+            stdscr (curses window): screen object
+        """
         current_row = 0
         self.print_menu(stdscr, current_row)
         while 1:
@@ -142,6 +178,11 @@ class View(object):
 
 
     def rental_menu(self, stdscr):
+        """Menu loop when creating a rental
+
+        Args:
+            stdscr (curses window): screen object
+        """
         current_row = 0
         res, col = self.get_available_rental_instruments()
         message = ["Choose the instrument you want to rent."]
@@ -161,6 +202,11 @@ class View(object):
             self.print_result(stdscr, result=res_string, col_names=col, selected_row_idx=current_row, messages=message)
 
     def terminate_rental_menu(self, stdscr):
+        """Menu loop for when terminating a rental.
+
+        Args:
+            stdscr (curses window): screen object
+        """
         current_row = 0
         student_id = self.get_number(stdscr, "Enter your student id", 100)
         res, col = self.student_rentals(student_id)
@@ -176,7 +222,6 @@ class View(object):
                     current_row += 1
                 elif key == curses.KEY_ENTER or key in [10, 13]:
                     try:
-                        prints(stdscr, str(res[current_row][-1]))
                         self.terminate_rental(res[current_row][-1])
                         stdscr.clear()
                         self.print_center(stdscr, f"Congratulations, you terminated your rental.", 15)
@@ -210,6 +255,13 @@ class View(object):
 
 
     def make_rental(self, stdscr, instrument, col_names):
+        """Menu loop when creating a rental
+
+        Args:
+            stdscr (curses window): screen object
+            instrument (tuple): a tuple of instrument attributes, result from database
+            col_names (tuple): names of the attributes
+        """
         message = ["Do you want to rent this instrument? Press y (yes) or any button"]
         instrument_string = self.row_to_string(instrument)
         self.print_result(stdscr, result=[instrument_string], col_names=col_names, messages=message)
@@ -246,6 +298,16 @@ class View(object):
 
 
     def get_number(self, stdscr, message, max) -> int:
+        """Function to let the user input a number
+
+        Args:
+            stdscr (curses window): screen object
+            message (str): the prompt for the user when inputting a number
+            max (int): the maximum in the span that the user can input. starts at 1
+
+        Returns:
+            int: [description]
+        """
         stdscr.clear()
         num = 1
         self.print_center(stdscr, message, 15)

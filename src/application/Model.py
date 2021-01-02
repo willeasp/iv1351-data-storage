@@ -56,8 +56,8 @@ def _model_test():
     db = DatabaseHandler()
     model = Model(db)
 
-    # # test 1
-    # assert model.get_available_rental_instruments()
+    # test 1
+    assert model.get_available_rental_instruments()
 
     # test 2
     try:
@@ -66,17 +66,17 @@ def _model_test():
     except:
         assert True
 
-    # # test 3
-    # try:
-    #     model.create_rental(4, 2, date.today(), 12)
-    #     assert False
-    # except:
-    #     assert True
+    # test 3
+    try:
+        model.create_rental(4, 2, date.today(), 12)
+        assert False
+    except:
+        assert True
 
-    # # test 4
-    # a, b = model.student_rentals(1)
-    # print(len(a))
-    # print(b)
+    # test 4
+    a, b = model.student_rentals(1)
+    print(len(a))
+    print(b)
 
 
 
