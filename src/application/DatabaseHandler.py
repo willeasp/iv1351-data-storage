@@ -41,9 +41,9 @@ class DatabaseHandler(object):
                 VALUES  (%s, %s::date + INTERVAL '%s month', %s , %s)
             """, [start_date, start_date, months_to_rent, student_id, rental_instrument])
             self.db.commit()
-        except:
+        except Exception as e:
             self.db.rollback()
-            raise RuntimeError("Could not rent instrument.")
+            raise RuntimeError("No student found to be able to complete rental.")
 
 
     def student_rentals(self, student_id:int) -> list:
@@ -132,11 +132,11 @@ class DatabaseHandler(object):
 
 if __name__ == "__main__":
     db = DatabaseHandler()
-    print(db.get_available_rental_instruments())
+    # print(db.get_available_rental_instruments())
 
-    db.create_rental(1, 2, date(2020, 1, 2), 12)
+    # db.create_rental(1, 2, date(2020, 1, 2), 12)
 
-    print("student 3 rentals:")
-    print(db.student_rentals(3))
+    # print("student 3 rentals:")
+    # print(db.student_rentals(3))
 
-    db.terminate_rental(9)
+    db.terminate_rental(35)

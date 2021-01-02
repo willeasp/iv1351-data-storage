@@ -53,8 +53,8 @@ class View(object):
         if messages:
             # prints(stdscr, str(messages))
             i = len(messages)
-            for i, message in enumerate(messages):
-                self.print_center(stdscr, message, (h//2 - len(res)// 2) -i -2)
+            for x, message in enumerate(messages):
+                self.print_center(stdscr, message, (h//2 - len(res)// 2) -i +x -2)
 
         # print lines
         width = 0
@@ -125,6 +125,8 @@ class View(object):
                 elif current_row == self.menu.index("Get students rentals"):
                     while 1:
                         student_id = self.get_number(stdscr, "Enter your student id", 100)
+                        if student_id == -1:
+                            break
                         res, col = self.student_rentals(student_id)
                         res = [self.row_to_string(row) for row in res]
                         messages = [f"Student {student_id} rentals", "Press b for main menu"]
@@ -160,7 +162,7 @@ class View(object):
 
     def terminate_rental_menu(self, stdscr):
         current_row = 0
-        student_id = self.get_student(stdscr)
+        student_id = self.get_number(stdscr, "Enter your student id", 100)
         res, col = self.student_rentals(student_id)
         if len(res) > 0:
             message = [f"Choose the rental you want to terminate."]
@@ -241,25 +243,6 @@ class View(object):
                 self.print_center(stdscr, f"Error: {e}", 16)
                 stdscr.refresh()
                 stdscr.getch()
-            
-
-    def get_student(self, stdscr) -> int:
-        stdscr.clear()
-        id = 1
-        self.print_center(stdscr, "Enter your student id", 15)
-        self.print_center(stdscr, str(id), 16)
-        while 1:
-            key = stdscr.getch()
-            if key == curses.KEY_UP and id > 1:
-                id -= 1
-            elif key == curses.KEY_DOWN and id < 100:
-                id += 1
-            elif key == curses.KEY_ENTER or key in [10, 13]:
-                return id
-            stdscr.clear()
-            self.print_center(stdscr, "Enter your student id", 15)
-            self.print_center(stdscr, str(id), 16)
-            stdscr.refresh()
 
 
     def get_number(self, stdscr, message, max) -> int:
@@ -275,6 +258,8 @@ class View(object):
                 num += 1
             elif key == curses.KEY_ENTER or key in [10, 13]:
                 return num
+            elif key == ord('b'):
+                return -1
             stdscr.clear()
             self.print_center(stdscr, message, 15)
             self.print_center(stdscr, str(num), 16)
