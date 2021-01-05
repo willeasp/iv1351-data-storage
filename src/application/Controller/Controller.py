@@ -7,7 +7,7 @@ December 30, 2020
 This class is the controller in the soundgood music school application.
 
  """
-from Model import Model
+from Model.Model import Model
 from datetime import date
 
 

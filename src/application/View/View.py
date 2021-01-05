@@ -11,7 +11,7 @@ window.
 
  """
 
-from Controller import Controller
+from Controller.Controller import Controller
 from datetime import date
 import curses
 
@@ -154,7 +154,8 @@ class View(object):
                 if current_row == self.menu.index("List instruments"):
                     res, col = self.get_available_rental_instruments()
                     res = [self.row_to_string(row) for row in res]
-                    self.print_result(stdscr, result=res, col_names=col)
+                    messages = ["Available rental instruments"]
+                    self.print_result(stdscr, result=res, col_names=col, messages=messages)
                     stdscr.getch()
                 elif current_row == self.menu.index("Rent instrument"):
                     self.rental_menu(stdscr)
@@ -340,22 +341,17 @@ class View(object):
         self.ctrl.terminate_rental(rental_id)
 
 
-def prints(stdscr, shit):
-    stdscr.addstr(20,0,shit)
+def prints(stdscr, msg):
+    stdscr.addstr(20,0,msg)
     stdscr.refresh()
     stdscr.getch()
 
-if __name__ == "__main__":
-    from DatabaseHandler import DatabaseHandler
-    from Model import Model
-    db = DatabaseHandler()
-    model = Model(db)
-    ctrl = Controller(model)
+# if __name__ == "__main__":
+    # from Integration.DatabaseHandler import DatabaseHandler
+    # from Model.Model import Model
+    # db = DatabaseHandler()
+    # model = Model(db)
+    # ctrl = Controller(model)
     
-    view = View(ctrl)
-
-
-
-
-
+    # view = View(ctrl)
 

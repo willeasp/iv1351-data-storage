@@ -34,6 +34,7 @@ class DatabaseHandler(object):
                 AND CURRENT_DATE < end_date
                 AND terminated IS NULL)
         """)
+        self.db.commit()
         return self._cursor_result()
 
     
@@ -67,7 +68,7 @@ class DatabaseHandler(object):
                 OR
                 terminated IS NULL);
          """, [student_id])
-        # return self.cursor.fetchall()
+        self.db.commit()
         return self._cursor_result()
 
 
@@ -90,6 +91,7 @@ class DatabaseHandler(object):
             FROM rental
             WHERE rental_id = %s        
         """, [rental_id])
+        self.db.commit()
         [res], col = self._cursor_result()
         return res
 
@@ -109,21 +111,7 @@ class DatabaseHandler(object):
 
 
     def _cursor_result(self) -> list:
-        # return self.to_json(self.cursor.fetchall())
         return self.cursor.fetchall(), [desc[0] for desc in self.cursor.description]
-
-
-    def to_json(self, o:object) -> str:
-        return json.dumps(o, default=self.customJSONEncoder)
-
-
-    def customJSONEncoder(self, o:object):
-        if isinstance(o, Decimal):
-            return o.__float__()
-        elif isinstance(o, date):
-            return self.date_to_strf(o)
-        else:
-            json.JSONEncoder.default(self, o)
 
     @staticmethod
     def date_to_strf(date:date):

@@ -1,9 +1,9 @@
 #! /usr/local/bin/python3
 
-from DatabaseHandler import DatabaseHandler
-from Model import Model
-from Controller import Controller
-from View import View
+from Integration.DatabaseHandler import DatabaseHandler
+from Model.Model import Model
+from Controller.Controller import Controller
+from View.View import View
 
 if __name__ == "__main__":
     # dbhandler

@@ -8,7 +8,7 @@ This class is responsible for the soundgood music school's business rules.
 
 """
 
-from DatabaseHandler import DatabaseHandler
+from Integration.DatabaseHandler import DatabaseHandler
 from datetime import date
 
 
@@ -18,7 +18,7 @@ class Model(object):
         print("Hello model!")
 
     
-    def get_available_rental_instruments(self) -> list:  # JSON
+    def get_available_rental_instruments(self) -> list:  
         """ Get the available rental instruments """
         return self.dbhandler.get_available_rental_instruments()
 
